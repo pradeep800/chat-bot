@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+    relationMode = "prisma"
+}
+model User {
+  id        String @id @unique
+  gmail      String
+  rooms     Room[]
+}
+
+model Room {
+  id            Int           @id @default(autoincrement())
+  user          User          @relation(fields: [userId], references: [id])
+  title        String
+  userId        String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        Int      @id @default(autoincrement())
+  owner Room @relation(fields: [ownerId],references: [id])
+  ownerId Int
+  messages  Message[]
+  summery String
+}
+
+model Message {
+  id            Int      @id @default(autoincrement())
+  conversation  Conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  text          String
+  writer   String
+  createdAt     DateTime @default(now())
+}
