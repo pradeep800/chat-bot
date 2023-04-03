@@ -10,9 +10,9 @@ export default function Navbar() {
   useEffect(() => {
     void setUserInfo(userInfoFromAuth);
   }, [userInfoFromAuth]);
-  async function SignInClick() {
+  function SignInClick() {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    void signInWithPopup(auth, provider);
   }
   return (
     <nav>
