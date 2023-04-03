@@ -20,7 +20,7 @@ export default function Navbar() {
       {userInfo.email ? (
         <div onClick={() => void signOut(auth)}>SignOut</div>
       ) : (
-        <div onClick={void SignInClick}>Login</div>
+        <div onClick={SignInClick}>Login</div>
       )}
     </nav>
   );
