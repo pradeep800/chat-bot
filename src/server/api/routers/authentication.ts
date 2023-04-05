@@ -6,7 +6,7 @@ import {
 import { prisma } from "~/server/db";
 
 export const authentication = createTRPCRouter({
-  login: authProcedure.query(async ({ ctx }) => {
+  login: authProcedure.mutation(async ({ ctx }) => {
     try {
       await prisma.user.create({
         data: ctx.userInfo,

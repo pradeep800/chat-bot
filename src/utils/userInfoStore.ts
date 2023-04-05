@@ -17,5 +17,9 @@ export const useInfo = create<UserInfoSchemaGetterAndSetter>(
     setUserInfo: ({ email, userId, profilePhoto }) => {
       set(() => ({ userInfo: { email, userId, profilePhoto } }));
     },
+    loading: true,
+    setLoading: (loading) => {
+      set(() => ({ loading }));
+    },
   })
 );

@@ -18,7 +18,7 @@ export const rooms = createTRPCRouter({
     return rooms;
   }),
   createRoom: authProcedure
-    .input(z.object({ title: z.string().optional() }))
+    .input(z.object({ title: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const room = await prisma.room.create({
         data: {

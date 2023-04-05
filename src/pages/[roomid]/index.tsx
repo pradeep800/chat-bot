@@ -5,7 +5,6 @@ import { useState } from "react";
 import { api } from "~/utils/api";
 import { useInfo } from "~/utils/userInfoStore";
 import robotPhoto from "~/images/robot.png";
-import { useLayoutEffect } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 export default function Room() {
@@ -17,9 +16,12 @@ export default function Room() {
     data: chats,
     isLoading,
     refetch,
-  } = api.conversations.allMessageOfRoom.useQuery({
-    roomId: parseInt(router.query.roomid as string),
-  });
+  } = api.conversations.allMessageOfRoom.useQuery(
+    {
+      roomId: parseInt(router.query.roomid as string),
+    },
+    { staleTime: Infinity }
+  );
   const { mutate } = api.conversations.askQuestion.useMutation({
     onSuccess: () => {
       void refetch();
@@ -30,7 +32,7 @@ export default function Room() {
     lastDiv.current?.scrollIntoView({ behavior: "smooth" });
   }, [chats]);
   if (isLoading) {
-    return <div>loading....</div>;
+    return <div>loading...</div>;
   }
   function askQuestion() {
     setAsking(true);
@@ -42,7 +44,13 @@ export default function Room() {
   }
   return (
     <div className="m-auto  max-w-[800px]">
-      <div>{!chats?.length && <div>No Conversation Yet</div>}</div>
+      <div>
+        {!chats?.length && (
+          <div className="flex h-[80vh] items-center justify-center text-lg font-bold text-blue-500 ">
+            No Conversation Yet
+          </div>
+        )}
+      </div>
 
       {chats?.map((chat) => {
         return (

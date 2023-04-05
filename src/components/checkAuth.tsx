@@ -8,7 +8,9 @@ export default function CheckAuth({ children }: { children: React.ReactNode }) {
       {userInfo.email ? (
         <>{children}</>
       ) : (
-        <div>Please Login Before Using This App</div>
+        <div className="flex h-[90vh] items-center justify-center text-lg font-bold text-blue-500  ">
+          Please Login Before Using This App
+        </div>
       )}
     </>
   );

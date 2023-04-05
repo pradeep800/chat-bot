@@ -3,24 +3,45 @@ import { useAuth } from "~/utils/useAuth";
 import { useInfo } from "~/utils/userInfoStore";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { auth } from "~/utils/firebase";
+import Link from "next/link";
+import Image from "next/image";
 export default function Navbar() {
   const setUserInfo = useInfo((state) => state.setUserInfo);
   const userInfo = useInfo((state) => state.userInfo);
-  const userInfoFromAuth = useAuth();
-  useEffect(() => {
-    void setUserInfo(userInfoFromAuth);
-  }, [userInfoFromAuth]);
+
   function SignInClick() {
     const provider = new GoogleAuthProvider();
     void signInWithPopup(auth, provider);
   }
   return (
     <nav className="flex">
-      <div className="mr-auto">Chat</div>
+      <Link className="mr-auto" href="/">
+        <div className="mr-auto">Chat</div>
+      </Link>
+
       {userInfo.email ? (
-        <div onClick={() => void signOut(auth)}>SignOut</div>
+        <div className="flex  gap-1">
+          <Image
+            className="rounded-full "
+            src={userInfo.profilePhoto}
+            alt="your Photo"
+            width={40}
+            height={40}
+          />
+          <div
+            className="rounded bg-red-300 p-2 hover:bg-red-400"
+            onClick={() => void signOut(auth)}
+          >
+            SignOut
+          </div>
+        </div>
       ) : (
-        <div onClick={SignInClick}>Login</div>
+        <div
+          className="rounded bg-blue-300 px-3 py-2 hover:bg-blue-400"
+          onClick={SignInClick}
+        >
+          Login
+        </div>
       )}
     </nav>
   );

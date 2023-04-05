@@ -1,26 +1,29 @@
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { api } from "./api";
-import { browserLocalPersistence, setPersistence } from "firebase/auth";
+import { useInfo } from "./userInfoStore";
 
 export function useAuth() {
-  const [user] = useAuthState(auth);
-  const [userInformation, setUserInformation] = useState({
-    profilePhoto: "",
-    userId: "",
-    email: "",
+  const [user, loading] = useAuthState(auth);
+  const setLoading = useInfo((state) => state.setLoading);
+  const setUserInfo = useInfo((state) => state.setUserInfo);
+  const { data, mutate } = api.authentication.login.useMutation({
+    onSuccess: (data) => {
+      setUserInfo(data);
+      setLoading(false);
+    },
+    onError: () => {
+      setLoading(false);
+    },
   });
-  const { data } = api.authentication.login.useQuery();
-
   useEffect(() => {
     if (!user) {
-      setUserInformation({ profilePhoto: "", userId: "", email: "" });
+      setUserInfo({ profilePhoto: "", userId: "", email: "" });
+    } else {
+      mutate();
+      return;
     }
-    if (data && user) {
-      setUserInformation(data);
-    }
-  }, [user, data]);
-
-  return userInformation;
+    setLoading(loading);
+  }, [user, loading]);
 }
