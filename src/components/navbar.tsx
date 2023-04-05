@@ -12,7 +12,7 @@ export default function Navbar() {
   }, [userInfoFromAuth]);
   function SignInClick() {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+    void signInWithPopup(auth, provider);
   }
   return (
     <nav className="flex">

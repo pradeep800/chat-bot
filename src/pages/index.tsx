@@ -1,17 +1,15 @@
 import { Room } from "@prisma/client";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
-import { use, useCallback, useEffect } from "react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import Navbar from "~/components/navbar";
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
   const { data: rooms, isLoading, refetch } = api.rooms.getAllRooms.useQuery();
   const { mutate: createRoomMutation } = api.rooms.createRoom.useMutation({
     onSuccess: () => {
-      refetch();
+      void refetch();
     },
   });
   const [someInput, setSomeInput] = useState(false);
@@ -77,7 +75,7 @@ const Home: NextPage = () => {
             key={room.roomId}
             on={on}
             setOn={setOn}
-            refetch={refetch}
+            refetch={() => void refetch()}
           />
         );
       })}

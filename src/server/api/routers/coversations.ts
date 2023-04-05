@@ -22,12 +22,7 @@ export const conversations = createTRPCRouter({
 
       let summery = "";
       if (roomInfo) {
-        summery =
-          "old qna summery is :-" +
-          roomInfo.summery +
-          "and your new question is :- " +
-          input.question +
-          " if needed give answer from old qna summery";
+        summery = `old qna summery is :-${roomInfo.summery} and your new question is :- ${input.question} most of the time use your own information but if needed give answer from old qna summery`;
       }
 
       const res = await api.createChatCompletion({
@@ -35,65 +30,51 @@ export const conversations = createTRPCRouter({
         messages: [
           {
             role: "user",
-            content: summery + " give answer as small as you can",
+            content: `${summery}  give answer as small as you can`,
           },
         ],
         max_tokens: 100,
       });
 
       const resText = res.data.choices[0]?.message?.content || "";
-      console.log(resText);
-      const mesPromise = prisma.message.create({
-        data: {
-          roomId: input.roomId,
-          text: input.question,
-          writer: "you",
-        },
-      });
-      const newSummeryPromise = await api.createChatCompletion({
+      if (!roomInfo) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+      const newSummery = await api.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
-            content:
-              "write a summery for old qna:- " +
-              roomInfo?.summery +
-              " and new question " +
-              input.question +
-              +" and answer is " +
-              resText +
-              " write summery as so you can understand whole context of before conversation",
+            content: `write a summery for old qna:- ${roomInfo.summery} and new question ${input.question}  and answer is ${resText}  write summery as so you can understand whole context of before conversation`,
           },
         ],
         max_tokens: 150,
       });
 
-      let [pNewSummery, pMes] = await Promise.allSettled([
-        newSummeryPromise,
-        mesPromise,
-      ]);
-
-      const newSummery =
-        pNewSummery.status === "fulfilled" ? pNewSummery.value : null;
-      const mes = pMes.status === "fulfilled" ? pMes.value : null;
-      if (newSummery && mes) {
-        await prisma.room.update({
+      await prisma.$transaction([
+        prisma.message.create({
+          data: {
+            roomId: input.roomId,
+            text: input.question,
+            writer: "you",
+          },
+        }),
+        prisma.room.update({
           where: { roomId: input.roomId },
           data: {
             summery: newSummery.data.choices[0]?.message?.content,
           },
-        });
-        await prisma.message.create({
+        }),
+        prisma.message.create({
           data: {
             roomId: input.roomId,
             text: resText,
             writer: "server",
           },
-        });
-        return res.data;
-      } else {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
+        }),
+      ]);
+
+      return res.data;
     }),
   allMessageOfRoom: authProcedure
     .input(z.object({ roomId: z.number() }))

@@ -20,7 +20,7 @@ export const rooms = createTRPCRouter({
   createRoom: authProcedure
     .input(z.object({ title: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
-      let room = await prisma.room.create({
+      const room = await prisma.room.create({
         data: {
           userId: ctx.userInfo.userId,
           title: input.title || "",
@@ -32,7 +32,7 @@ export const rooms = createTRPCRouter({
   editRoomTitle: authProcedure
     .input(z.object({ title: z.string(), roomId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      let room = await prisma.room.update({
+      const room = await prisma.room.update({
         where: { roomId: input.roomId },
         data: { title: input.title },
       });
@@ -41,7 +41,7 @@ export const rooms = createTRPCRouter({
   deleteRoom: authProcedure
     .input(z.object({ roomId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      let room = await prisma.room.delete({
+      const room = await prisma.room.delete({
         where: {
           roomId: input.roomId,
         },

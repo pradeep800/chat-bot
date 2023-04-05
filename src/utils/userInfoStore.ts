@@ -11,11 +11,11 @@ export const useInfo = create<UserInfoSchemaGetterAndSetter>(
     userInfo: {
       profilePhoto: "",
       email: "",
-      id: "",
+      userId: "",
     },
 
-    setUserInfo: ({ email, id, profilePhoto }) => {
-      set(() => ({ userInfo: { email, id, profilePhoto } }));
+    setUserInfo: ({ email, userId, profilePhoto }) => {
+      set(() => ({ userInfo: { email, userId, profilePhoto } }));
     },
   })
 );
