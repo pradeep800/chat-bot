@@ -64,7 +64,7 @@ export default function Room() {
             setQuestion(e.target.value);
           }}
         />
-        <button className="grow-[1] bg-blue-300" onClick={askQuestion}>
+        <button className="grow-[1] bg-blue-300 p-2" onClick={askQuestion}>
           Ask
         </button>
       </div>

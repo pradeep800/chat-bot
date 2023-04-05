@@ -1,10 +1,10 @@
 import { Room } from "@prisma/client";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { api } from "~/utils/api";
-
+import * as _ from "lodash";
 const Home: NextPage = () => {
   const { data: rooms, isLoading, refetch } = api.rooms.getAllRooms.useQuery();
   const { mutate: createRoomMutation } = api.rooms.createRoom.useMutation({
@@ -82,6 +82,7 @@ const Home: NextPage = () => {
     </div>
   );
 };
+let a = 0;
 function Room({
   room,
   on,
@@ -106,6 +107,7 @@ function Room({
     setOn(true);
     setTitle(room.title);
   };
+  console.log(a++);
   const resetFalse = () => {
     setEdit(false);
     setOn(false);
@@ -177,4 +179,9 @@ function Room({
     </div>
   );
 }
+// const MemoizedRoom = memo(Room, (prevChat, NextChat) => {
+//   let res = _.isEqual(prevChat, NextChat);
+//   console.log(res);
+//   return res;
+// });
 export default Home;
