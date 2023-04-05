@@ -1,5 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import {
+  getAuth,
+  browserLocalPersistence,
+  setPersistence,
+} from "firebase/auth";
 const firebaseConfig = {
   apiKey: "AIzaSyCREYWwIwsnC5U49IGJJ9LlNafbRkvsqBY",
   authDomain: "chat-bot-61b95.firebaseapp.com",
@@ -11,4 +15,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+const auth = getAuth(app);
+
+export { auth };

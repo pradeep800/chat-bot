@@ -82,7 +82,7 @@ const authMiddleware = t.middleware(async ({ ctx, next }) => {
       const user = await auth.verifyIdToken(JWTToken);
 
       userInfo = {
-        id: user.uid,
+        userId: user.uid,
         email: user.email,
         profilePhoto: user.picture,
       };

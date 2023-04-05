@@ -1,7 +1,7 @@
 import { z } from "zod";
 export const zUserInfoSchema = z.object({
   profilePhoto: z.string(),
-  id: z.string(),
+  userId: z.string(),
   email: z.string().email(),
 });
 export const zUserInfoSchemaSetter = z.function(

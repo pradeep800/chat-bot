@@ -12,11 +12,11 @@ export default function Navbar() {
   }, [userInfoFromAuth]);
   function SignInClick() {
     const provider = new GoogleAuthProvider();
-    void signInWithPopup(auth, provider);
+    return signInWithPopup(auth, provider);
   }
   return (
-    <nav>
-      <div>Chat</div>
+    <nav className="flex">
+      <div className="mr-auto">Chat</div>
       {userInfo.email ? (
         <div onClick={() => void signOut(auth)}>SignOut</div>
       ) : (
