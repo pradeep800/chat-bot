@@ -22,7 +22,7 @@ export const conversations = createTRPCRouter({
 
       let summery = "";
       if (roomInfo) {
-        summery = `old qna summery is :-${roomInfo.summery} and your new question is :- ${input.question} most of the time use your own information but if needed give answer from old qna summery`;
+        summery = `old qna summery is :-${roomInfo.summery} and your new question is :- ${input.question} ? most of the time use your own information but if needed give answer from old qna summery`;
       }
 
       const res = await api.createChatCompletion({
@@ -79,7 +79,6 @@ export const conversations = createTRPCRouter({
   allMessageOfRoom: authProcedure
     .input(z.object({ roomId: z.number() }))
     .query(({ input }) => {
-      console.log(input.roomId);
       return prisma.message.findMany({ where: { roomId: input.roomId } });
     }),
 });

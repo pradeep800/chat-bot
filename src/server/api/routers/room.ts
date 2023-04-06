@@ -1,5 +1,5 @@
 import { z } from "zod";
-
+import { noOfRoomForPagination } from "~/staticVeriable/paginationRoom";
 import {
   authProcedure,
   createTRPCRouter,
@@ -10,13 +10,32 @@ import { prisma } from "~/server/db";
  * TODO: Pagination
  */
 export const rooms = createTRPCRouter({
-  getAllRooms: authProcedure.query(async ({ ctx }) => {
+  get15Rooms: authProcedure.query(async ({ ctx }) => {
     const rooms = await prisma.room.findMany({
       where: { userId: ctx.userInfo.userId },
       orderBy: [{ updatedAt: "desc" }],
+      take: noOfRoomForPagination,
     });
     return rooms;
   }),
+  getNext15Rooms: authProcedure
+    .input(z.object({ cursorId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (!input.cursorId) {
+        return [];
+      }
+      const rooms = await prisma.room.findMany({
+        where: { userId: ctx.userInfo.userId },
+        skip: 1,
+        orderBy: [{ updatedAt: "desc" }],
+        cursor: {
+          roomId: input.cursorId,
+        },
+        take: noOfRoomForPagination,
+      });
+      return rooms;
+    }),
+
   createRoom: authProcedure
     .input(z.object({ title: z.string() }))
     .mutation(async ({ ctx, input }) => {

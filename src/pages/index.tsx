@@ -1,11 +1,13 @@
 import { Room } from "@prisma/client";
 import { type NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { api } from "~/utils/api";
 import * as _ from "lodash";
 import { useInfo } from "~/utils/userInfoStore";
 import RoomList from "~/components/roomList";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { noOfRoomForPagination } from "~/staticVeriable/paginationRoom";
 
 export const TenMillion = 100000000;
 const Home: NextPage = () => {
@@ -15,14 +17,19 @@ const Home: NextPage = () => {
     data: rooms,
     isLoading,
     refetch,
-  } = api.rooms.getAllRooms.useQuery(undefined, { staleTime: Infinity });
+  } = api.rooms.get15Rooms.useQuery(undefined, { staleTime: Infinity });
+  const [allRoom, setAllRoom] = useState<Room[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  /*
+   * Fetching First 15 Rooms
+   */
   const { mutate: createRoomMutation } = api.rooms.createRoom.useMutation({
     onSuccess: () => {
       void refetch();
     },
     onMutate: async (newRoomTitle) => {
-      await utils.rooms.getAllRooms.cancel();
-      const prevData = utils.rooms.getAllRooms.getData();
+      await utils.rooms.get15Rooms.cancel();
+      const prevRooms = utils.rooms.get15Rooms.getData();
       //TODO Change room Id
       const newRoom = {
         roomId: TenMillion,
@@ -31,23 +38,39 @@ const Home: NextPage = () => {
         userId: userInfo.userId,
         updatedAt: new Date(Date.now()),
       } as Room;
-      utils.rooms.getAllRooms.setData(undefined, (prevData) => [
-        newRoom,
-        ...(prevData ?? []),
-      ]);
+      setAllRoom([newRoom, ...(prevRooms ?? [])]);
 
       return {
-        prevData,
+        prevRooms,
       };
     },
     onError: (err, newRoomTitle, ctx) => {
-      utils.rooms.getAllRooms.setData(undefined, ctx?.prevData);
+      setAllRoom(ctx?.prevRooms ?? []);
       toast.error("Unable To Create Room");
     },
   });
+  const { mutate: getNext15Rooms } = api.rooms.getNext15Rooms.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+      setHasMore(data.length === noOfRoomForPagination ? true : false);
+      setAllRoom((prev) => [...prev, ...data]);
+    },
+  });
+  console.log(hasMore);
+  /*
+   * title for creating new Room
+   * on for checking if someone else is not editing another room
+   * edit for Opening edit
+   */
   const [title, setTitle] = useState("");
   const [on, setOn] = useState(false);
   const [edit, setEdit] = useState(false);
+
+  useEffect(() => {
+    if (rooms) {
+      setAllRoom(rooms ?? []);
+    }
+  }, [rooms]);
   function resetFalse() {
     setEdit(false);
     setOn(false);
@@ -62,8 +85,13 @@ const Home: NextPage = () => {
     createRoomMutation({ title: title });
     resetFalse();
   }
-
-  if (isLoading && !rooms) {
+  function NextRooms() {
+    const lastRoom = allRoom[allRoom.length - 1];
+    if (lastRoom) {
+      getNext15Rooms({ cursorId: lastRoom.roomId });
+    }
+  }
+  if (!rooms) {
     return <div>loading....</div>;
   }
 
@@ -99,18 +127,25 @@ const Home: NextPage = () => {
       </div>
 
       <div>allRoom</div>
-
-      {rooms?.map((room) => {
-        return (
-          <RoomList
-            room={room}
-            key={room.roomId}
-            on={on}
-            setOn={setOn}
-            refetch={() => void refetch()}
-          />
-        );
-      })}
+      <InfiniteScroll
+        dataLength={allRoom.length}
+        next={NextRooms}
+        hasMore={hasMore}
+        loader={<div>loading...</div>}
+        endMessage={<div></div>}
+      >
+        {allRoom.map((room) => {
+          return (
+            <RoomList
+              room={room}
+              key={room.roomId}
+              on={on}
+              setOn={setOn}
+              setAllRoom={setAllRoom}
+            />
+          );
+        })}
+      </InfiniteScroll>
     </div>
   );
 };

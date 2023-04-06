@@ -5,28 +5,35 @@ import { api } from "~/utils/api";
 import { TenMillion } from "~/pages";
 import { toast } from "react-hot-toast";
 import { useInfo } from "~/utils/userInfoStore";
+interface RoomListSchema {
+  room: Room;
+  on: boolean;
+  setOn: (bol: boolean) => void;
+  setAllRoom: (room: Room[]) => void;
+}
 export default function RoomList({
   room,
   on,
   setOn,
-  refetch,
-}: {
-  room: Room;
-  on: boolean;
-  setOn: (bol: boolean) => void;
-  refetch: () => void;
-}) {
+  setAllRoom,
+}: RoomListSchema) {
   const utils = api.useContext();
   const router = useRouter();
   const userInfo = useInfo((state) => state.userInfo);
   const { mutate: editMutation } = api.rooms.editRoomTitle.useMutation({
-    onSuccess: () => {
-      void refetch();
+    onSuccess: (updatedRoom) => {
+      const prevRooms = utils.rooms.get15Rooms.getData();
+      const prevRoomsWithoutUpdatedRoom = prevRooms?.filter((room) => {
+        return room.roomId !== updatedRoom.roomId;
+      });
+      setAllRoom([updatedRoom, ...(prevRoomsWithoutUpdatedRoom ?? [])]);
     },
     onMutate: (changedRoomTitle) => {
-      const prevData = utils.rooms.getAllRooms.getData();
+      const prevRooms = utils.rooms.get15Rooms.getData();
       //TODO Change roomId
-
+      const preRoomsWithoutUpdatedRoom = prevRooms?.filter((odlRoom) => {
+        return odlRoom.roomId !== room.roomId;
+      });
       const changedRoom = {
         roomId: TenMillion, //fake for now
         title: changedRoomTitle.title,
@@ -34,18 +41,17 @@ export default function RoomList({
         userId: userInfo.userId,
         updatedAt: new Date(Date.now()), //fake for now
       } as Room;
-      utils.rooms.getAllRooms.setData(undefined, (prevData) => [
-        changedRoom,
-        ...(prevData ?? []),
-      ]);
+      setAllRoom([changedRoom, ...(preRoomsWithoutUpdatedRoom ?? [])]);
 
       return {
-        prevData,
+        prevRooms,
       };
     },
     onError: (err, changedRoomTitle, ctx) => {
+      const prevRooms = utils.rooms.get15Rooms.getData();
+
+      setAllRoom(prevRooms ?? []);
       toast.error("Unable To Update The Title");
-      utils.rooms.getAllRooms.setData(undefined, ctx?.prevData);
     },
   });
   const [title, setTitle] = useState(room.title);
