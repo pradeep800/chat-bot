@@ -74,6 +74,11 @@ const Home: NextPage = () => {
       setAllRoom(rooms ?? []);
     }
   }, [rooms]);
+  useEffect(() => {
+    if (!isLoading && JSON.stringify([]) === JSON.stringify(rooms)) {
+      setHasMore(false);
+    }
+  }, [isLoading]);
   function resetFalse() {
     setEdit(false);
     setOn(false);
@@ -94,6 +99,7 @@ const Home: NextPage = () => {
       getNext15Rooms({ cursorId: lastRoom.roomId });
     }
   }
+
   if (!rooms) {
     return <div>loading....</div>;
   }
