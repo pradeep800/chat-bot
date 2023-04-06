@@ -21,18 +21,18 @@ const Home: NextPage = () => {
     staleTime: Infinity,
     refetchOnMount: true,
   });
-  const [allRoom, setAllRoom] = useState<Room[]>([]);
   const [hasMore, setHasMore] = useState(true);
   /*
    * Fetching First 15 Rooms
    */
   const { mutate: createRoomMutation } = api.rooms.createRoom.useMutation({
-    onSuccess: () => {
-      void refetch();
-    },
-    onMutate: async (newRoomTitle) => {
-      await utils.rooms.get15Rooms.cancel();
+    onSuccess: (data) => {
       const prevRooms = utils.rooms.get15Rooms.getData();
+      prevRooms?.shift();
+      const newRooms = [data, ...(prevRooms ?? [])];
+      utils.rooms.get15Rooms.setData(undefined, () => newRooms);
+    },
+    onMutate: (newRoomTitle) => {
       //TODO Change room Id
       const newRoom = {
         roomId: TenMillion,
@@ -41,21 +41,29 @@ const Home: NextPage = () => {
         userId: userInfo.userId,
         updatedAt: new Date(Date.now()),
       } as Room;
-      setAllRoom([newRoom, ...(prevRooms ?? [])]);
+      const prevRooms = utils.rooms.get15Rooms.getData();
+      //check here
+      utils.rooms.get15Rooms.setData(undefined, (old) => [
+        newRoom,
+        ...(old || []),
+      ]);
 
       return {
         prevRooms,
       };
     },
     onError: (err, newRoomTitle, ctx) => {
-      setAllRoom(ctx?.prevRooms ?? []);
+      utils.rooms.get15Rooms.setData(undefined, (old) => ctx?.prevRooms);
       toast.error("Unable To Create Room");
     },
   });
   const { mutate: getNext15Rooms } = api.rooms.getNext15Rooms.useMutation({
     onSuccess: (data) => {
       setHasMore(data.length === noOfRoomForPagination ? true : false);
-      setAllRoom((prev) => [...prev, ...data]);
+      utils.rooms.get15Rooms.setData(undefined, (oldRooms) => [
+        ...(oldRooms ?? []),
+        ...data,
+      ]);
     },
   });
   /*
@@ -69,11 +77,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     void refetch();
   }, []);
-  useEffect(() => {
-    if (rooms) {
-      setAllRoom(rooms ?? []);
-    }
-  }, [rooms]);
+
   useEffect(() => {
     if (!isLoading && JSON.stringify([]) === JSON.stringify(rooms)) {
       setHasMore(false);
@@ -94,9 +98,13 @@ const Home: NextPage = () => {
     resetFalse();
   }
   function NextRooms() {
-    const lastRoom = allRoom[allRoom.length - 1];
-    if (lastRoom) {
-      getNext15Rooms({ cursorId: lastRoom.roomId });
+    if (rooms) {
+      const lastRoom = rooms[rooms.length - 1];
+      if (lastRoom) {
+        getNext15Rooms({ cursorId: lastRoom.roomId });
+      } else {
+        setHasMore(false);
+      }
     }
   }
 
@@ -135,24 +143,17 @@ const Home: NextPage = () => {
         </button>
       </div>
 
-      <div>allRoom</div>
+      <div>rooms</div>
       <InfiniteScroll
-        dataLength={allRoom.length}
+        dataLength={rooms.length}
         next={NextRooms}
         hasMore={hasMore}
         loader={<div>loading...</div>}
         endMessage={<div></div>}
       >
-        {allRoom.map((room) => {
+        {rooms.map((room) => {
           return (
-            <RoomList
-              allRooms={allRoom}
-              room={room}
-              key={room.roomId}
-              on={on}
-              setOn={setOn}
-              setAllRoom={setAllRoom}
-            />
+            <RoomList room={room} key={room.roomId} on={on} setOn={setOn} />
           );
         })}
       </InfiniteScroll>
