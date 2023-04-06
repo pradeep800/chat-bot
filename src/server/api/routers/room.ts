@@ -6,6 +6,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
+import { TRPCError } from "@trpc/server";
 /*
  * TODO: Pagination
  */

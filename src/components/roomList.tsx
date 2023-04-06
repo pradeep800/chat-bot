@@ -1,6 +1,6 @@
 import { Room } from "@prisma/client";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { api } from "~/utils/api";
 import { TenMillion } from "~/pages";
 import { toast } from "react-hot-toast";
@@ -9,31 +9,34 @@ interface RoomListSchema {
   room: Room;
   on: boolean;
   setOn: (bol: boolean) => void;
-  setAllRoom: (room: Room[]) => void;
+  setAllRoom: Dispatch<SetStateAction<Room[]>>;
+  allRooms: Room[];
 }
 export default function RoomList({
   room,
   on,
   setOn,
   setAllRoom,
+  allRooms,
 }: RoomListSchema) {
+  const oldRoomValue = useRef<Room[]>(allRooms);
   const utils = api.useContext();
   const router = useRouter();
   const userInfo = useInfo((state) => state.userInfo);
+  const [oldValue, setOldValue] = useState<Room[]>([]);
   const { mutate: editMutation } = api.rooms.editRoomTitle.useMutation({
     onSuccess: (updatedRoom) => {
-      const prevRooms = utils.rooms.get15Rooms.getData();
-      const prevRoomsWithoutUpdatedRoom = prevRooms?.filter((room) => {
-        return room.roomId !== updatedRoom.roomId;
-      });
-      setAllRoom([updatedRoom, ...(prevRoomsWithoutUpdatedRoom ?? [])]);
+      const prevRoomsWithoutUpdatedRoom = oldRoomValue.current?.filter(
+        (room) => {
+          return room.roomId !== updatedRoom.roomId;
+        }
+      );
+      setAllRoom([updatedRoom, ...prevRoomsWithoutUpdatedRoom]);
     },
     onMutate: (changedRoomTitle) => {
-      const prevRooms = utils.rooms.get15Rooms.getData();
+      let prevRooms: Room[] = [];
       //TODO Change roomId
-      const preRoomsWithoutUpdatedRoom = prevRooms?.filter((odlRoom) => {
-        return odlRoom.roomId !== room.roomId;
-      });
+
       const changedRoom = {
         roomId: TenMillion, //fake for now
         title: changedRoomTitle.title,
@@ -41,19 +44,25 @@ export default function RoomList({
         userId: userInfo.userId,
         updatedAt: new Date(Date.now()), //fake for now
       } as Room;
-      setAllRoom([changedRoom, ...(preRoomsWithoutUpdatedRoom ?? [])]);
+      setAllRoom((prevRoomsState) => {
+        prevRooms = [...prevRoomsState];
 
+        const oldRoom = prevRoomsState.filter((roomState) => {
+          return roomState.roomId !== room.roomId;
+        });
+        return [changedRoom, ...oldRoom];
+      });
+      //Controversial
       return {
         prevRooms,
       };
     },
     onError: (err, changedRoomTitle, ctx) => {
-      const prevRooms = utils.rooms.get15Rooms.getData();
-
-      setAllRoom(prevRooms ?? []);
+      setAllRoom(oldRoomValue.current);
       toast.error("Unable To Update The Title");
     },
   });
+
   const [title, setTitle] = useState(room.title);
   const [edit, setEdit] = useState(false);
   const resetTrue = () => {

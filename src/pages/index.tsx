@@ -17,7 +17,10 @@ const Home: NextPage = () => {
     data: rooms,
     isLoading,
     refetch,
-  } = api.rooms.get15Rooms.useQuery(undefined, { staleTime: Infinity });
+  } = api.rooms.get15Rooms.useQuery(undefined, {
+    staleTime: Infinity,
+    refetchOnMount: true,
+  });
   const [allRoom, setAllRoom] = useState<Room[]>([]);
   const [hasMore, setHasMore] = useState(true);
   /*
@@ -51,12 +54,10 @@ const Home: NextPage = () => {
   });
   const { mutate: getNext15Rooms } = api.rooms.getNext15Rooms.useMutation({
     onSuccess: (data) => {
-      console.log(data);
       setHasMore(data.length === noOfRoomForPagination ? true : false);
       setAllRoom((prev) => [...prev, ...data]);
     },
   });
-  console.log(hasMore);
   /*
    * title for creating new Room
    * on for checking if someone else is not editing another room
@@ -65,7 +66,9 @@ const Home: NextPage = () => {
   const [title, setTitle] = useState("");
   const [on, setOn] = useState(false);
   const [edit, setEdit] = useState(false);
-
+  useEffect(() => {
+    void refetch();
+  }, []);
   useEffect(() => {
     if (rooms) {
       setAllRoom(rooms ?? []);
@@ -137,6 +140,7 @@ const Home: NextPage = () => {
         {allRoom.map((room) => {
           return (
             <RoomList
+              allRooms={allRoom}
               room={room}
               key={room.roomId}
               on={on}

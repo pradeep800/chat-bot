@@ -1,7 +1,7 @@
 import { Message } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { api } from "~/utils/api";
 import { useInfo } from "~/utils/userInfoStore";
 import robotPhoto from "~/images/robot.png";
@@ -23,13 +23,13 @@ export default function Room() {
     { staleTime: Infinity }
   );
   const { mutate } = api.conversations.askQuestion.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       void refetch();
     },
   });
   const [question, setQuestion] = useState("");
-  useEffect(() => {
-    lastDiv.current?.scrollIntoView({ behavior: "smooth" });
+  useLayoutEffect(() => {
+    lastDiv.current?.scrollIntoView();
   }, [chats]);
   if (isLoading) {
     return <div>loading...</div>;
