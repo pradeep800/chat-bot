@@ -79,6 +79,15 @@ export const conversations = createTRPCRouter({
   allMessageOfRoom: authProcedure
     .input(z.object({ roomId: z.number() }))
     .query(({ input }) => {
-      return prisma.message.findMany({ where: { roomId: input.roomId } });
+      return prisma.message.findMany({
+        where: { roomId: input.roomId },
+      });
     }),
+  //remove it afterward
+  example: authProcedure.query(async ({ ctx }) => {
+    // await prisma.room.deleteMany();
+    // await prisma.user.deleteMany();
+    // await prisma.message.deleteMany();
+    // return prisma.room.findMany({ select: { coversations: true } });
+  }),
 });

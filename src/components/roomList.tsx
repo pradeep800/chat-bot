@@ -5,15 +5,19 @@ import { api } from "~/utils/api";
 import { TenMillion } from "~/pages";
 import { toast } from "react-hot-toast";
 import { useInfo } from "~/utils/userInfoStore";
+import relativeTime from "dayjs/plugin/relativeTime";
+import dayjs from "dayjs";
 interface RoomListSchema {
   room: Room;
   on: boolean;
   setOn: (bol: boolean) => void;
 }
+dayjs.extend(relativeTime);
 export default function RoomList({ room, on, setOn }: RoomListSchema) {
   const utils = api.useContext();
   const router = useRouter();
   const userInfo = useInfo((state) => state.userInfo);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { mutate: editMutation } = api.rooms.editRoomTitle.useMutation({
     onSuccess: (updatedRoom) => {
       const prevRooms = utils.rooms.get15Rooms.getData();
@@ -63,10 +67,16 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
     setOn(false);
     setTitle(room.title);
   };
+  useEffect(() => {
+    if (inputRef.current && edit) {
+      // If input element exists and edit mode is on, focus on the input element
+      inputRef.current.focus();
+    }
+  }, [edit]);
 
   return (
     <div
-      className="my-2 border-2"
+      className=" my-2 rounded border border-gray-200 p-4"
       onClick={(e) => {
         if (room.roomId === TenMillion) {
           toast.error("Please Wait...");
@@ -78,13 +88,15 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
     >
       <div>
         <div className={`${edit ? "hidden" : "flex"} `}>
-          <div className="mr-auto">title:-{room.title}</div>
+          <div className="m-1.5 mr-auto text-2xl font-bold">{room.title}</div>
           {TenMillion !== room.roomId && (
             <div
+              className="text-xl font-semibold"
               onClick={(e) => {
                 e.stopPropagation();
                 if (!on) {
                   resetTrue();
+                  console.log(inputRef.current);
                 } else {
                   toast.error("Complete Previous Editing..");
                 }
@@ -96,13 +108,14 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
         </div>
 
         <div
-          className={`${edit ? "block" : "hidden"} border-2`}
+          className={`${edit ? "flex" : "hidden"} `}
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
           <input
-            className="border-2"
+            ref={inputRef}
+            className="  mr-auto grow-[1] focus:border-transparent focus:outline-none"
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
@@ -113,7 +126,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
               editMutation({ roomId: room.roomId, title });
               resetFalse();
             }}
-            className="m-2 border-2"
+            className="m-2 "
           >
             save
           </button>
@@ -121,15 +134,14 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
             onClick={() => {
               resetFalse();
             }}
-            className="m-2 border-2"
+            className=" m-2"
           >
             cancel
           </button>
         </div>
       </div>
       <div className="flex ">
-        <div className="mr-auto">{typeof room.createdAt}</div>
-        <div>{typeof room.updatedAt}</div>
+        <div className="mr-auto">{dayjs(room.createdAt).fromNow()}</div>
       </div>
     </div>
   );

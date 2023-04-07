@@ -16,8 +16,6 @@
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 
-import { prisma } from "~/server/db";
-
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
  * it from here.
@@ -30,7 +28,6 @@ import { prisma } from "~/server/db";
  */
 const createInnerTRPCContext = ({ req, res }: CreateNextContextOptions) => {
   return {
-    prisma,
     req,
     res,
   };

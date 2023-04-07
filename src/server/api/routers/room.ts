@@ -56,6 +56,7 @@ export const rooms = createTRPCRouter({
         where: { roomId: input.roomId },
         data: { title: input.title },
       });
+
       return room;
     }),
   deleteRoom: authProcedure
