@@ -76,7 +76,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
 
   return (
     <div
-      className=" my-2 flex items-center rounded border border-gray-200 p-4"
+      className=" my-2 flex items-center rounded border border-gray-200 p-4 md:p-6"
       onClick={(e) => {
         if (room.roomId === TenMillion) {
           toast.error("Please Wait...");
@@ -94,16 +94,27 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
           ref={inputRef}
           className={`${
             edit ? "block" : "hidden"
-          } text-xl font-bold focus:border-transparent focus:outline-none`}
+          }  w-[100%] text-xl font-bold focus:border-transparent focus:outline-none `}
           value={title}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
           onChange={(e) => {
             setTitle(e.target.value);
           }}
         />
-        <div className="mr-auto">{dayjs(room.updatedAt).fromNow()}</div>
+        <div
+          className="mr-auto text-base"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          {dayjs(room.updatedAt).fromNow()}
+        </div>
       </div>
 
       <div
+        className=""
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -111,7 +122,8 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
         {room.roomId !== TenMillion && (
           <button
             className={`${edit ? "hidden" : "flex"} `}
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               if (!on) {
                 resetTrue();
               } else {
@@ -125,7 +137,8 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
 
         <div className={`${edit ? "flex" : "hidden"} gap-2 `}>
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               editMutation({ roomId: room.roomId, title });
               resetFalse();
             }}
@@ -133,7 +146,8 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
             save
           </button>
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               resetFalse();
             }}
           >

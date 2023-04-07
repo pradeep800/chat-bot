@@ -55,7 +55,7 @@ export default function CreateRooms({
   return (
     <div className="my-5 mt-8 flex justify-center">
       <input
-        className={` mr-3 rounded border-2`}
+        className={`mr-3 rounded border-2`}
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
@@ -64,7 +64,11 @@ export default function CreateRooms({
       <div
         className="rounded bg-slate-300 p-1 hover:bg-slate-400"
         onClick={() => {
-          createRoom();
+          if (title) {
+            createRoom();
+          } else {
+            toast.error("Write Title");
+          }
         }}
       >
         addRoom

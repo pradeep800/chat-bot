@@ -19,7 +19,6 @@ const Home: NextPage = () => {
     return Math.min(length, 8);
   });
   const utils = api.useContext();
-  const userInfo = useInfo((state) => state.userInfo);
   const {
     data: rooms,
     isLoading,
@@ -76,11 +75,12 @@ const Home: NextPage = () => {
     const allSkeleton = new Array(skeletonRoomLength).fill(0);
     return (
       <>
-        <CreateRooms on={on} setOn={setOn} />
-
-        {allSkeleton.map((_, index) => (
-          <Skeleton key={index} />
-        ))}
+        <div className="mx-auto max-w-[800px]">
+          <CreateRooms on={on} setOn={setOn} />
+          {allSkeleton.map((_, index) => (
+            <Skeleton key={index} />
+          ))}
+        </div>
       </>
     );
   }
