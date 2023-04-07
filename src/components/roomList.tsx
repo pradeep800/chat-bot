@@ -76,7 +76,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
 
   return (
     <div
-      className=" my-2 rounded border border-gray-200 p-4"
+      className=" my-2 flex items-center rounded border border-gray-200 p-4"
       onClick={(e) => {
         if (room.roomId === TenMillion) {
           toast.error("Please Wait...");
@@ -86,47 +86,49 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
         void router.push(`/${room.roomId}`);
       }}
     >
-      <div>
-        <div className={`${edit ? "hidden" : "flex"} `}>
-          <div className="m-1.5 mr-auto text-2xl font-bold">{room.title}</div>
-          {TenMillion !== room.roomId && (
-            <div
-              className="text-xl font-semibold"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!on) {
-                  resetTrue();
-                  console.log(inputRef.current);
-                } else {
-                  toast.error("Complete Previous Editing..");
-                }
-              }}
-            >
-              edit
-            </div>
-          )}
+      <div className="mr-auto">
+        <div className={`${edit ? "hidden" : "block"} text-xl font-bold `}>
+          {room.title}
         </div>
-
-        <div
-          className={`${edit ? "flex" : "hidden"} `}
-          onClick={(e) => {
-            e.stopPropagation();
+        <input
+          ref={inputRef}
+          className={`${
+            edit ? "block" : "hidden"
+          } text-xl font-bold focus:border-transparent focus:outline-none`}
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value);
           }}
-        >
-          <input
-            ref={inputRef}
-            className="  mr-auto grow-[1] focus:border-transparent focus:outline-none"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
+        />
+        <div className="mr-auto">{dayjs(room.updatedAt).fromNow()}</div>
+      </div>
+
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        {room.roomId !== TenMillion && (
+          <button
+            className={`${edit ? "hidden" : "flex"} `}
+            onClick={() => {
+              if (!on) {
+                resetTrue();
+              } else {
+                toast.error("You Cannot Update Multiple Rooms At Same Time");
+              }
             }}
-          />
+          >
+            Edit
+          </button>
+        )}
+
+        <div className={`${edit ? "flex" : "hidden"} gap-2 `}>
           <button
             onClick={() => {
               editMutation({ roomId: room.roomId, title });
               resetFalse();
             }}
-            className="m-2 "
           >
             save
           </button>
@@ -134,14 +136,10 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
             onClick={() => {
               resetFalse();
             }}
-            className=" m-2"
           >
             cancel
           </button>
         </div>
-      </div>
-      <div className="flex ">
-        <div className="mr-auto">{dayjs(room.createdAt).fromNow()}</div>
       </div>
     </div>
   );

@@ -15,7 +15,6 @@ export default function CreateRooms({
   const utils = api.useContext();
   const userInfo = useInfo((state) => state.userInfo);
   const [title, setTitle] = useState("");
-  const [edit, setEdit] = useState(false);
   const { mutate: createRoomMutation } = api.rooms.createRoom.useMutation({
     onSuccess: (data) => {
       const prevRooms = utils.rooms.get15Rooms.getData();
@@ -48,52 +47,28 @@ export default function CreateRooms({
       toast.error("Unable To Create Room");
     },
   });
-  function resetFalse() {
-    setEdit(false);
-    setOn(false);
-    setTitle("");
-  }
-  function resetTrue() {
-    setEdit(true);
-    setOn(true);
-    setTitle("");
-  }
+
   function createRoom() {
     createRoomMutation({ title: title });
-    resetFalse();
+    setTitle("");
   }
   return (
-    <>
+    <div className="my-5 mt-8 flex justify-center">
+      <input
+        className={` mr-3 rounded border-2`}
+        value={title}
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
       <div
+        className="rounded bg-slate-300 p-1 hover:bg-slate-400"
         onClick={() => {
-          if (!on) {
-            resetTrue();
-          } else {
-            toast.error("something is is Editing....");
-          }
+          createRoom();
         }}
       >
         addRoom
       </div>
-      <div
-        className={`${edit ? "block" : "hidden"} border border-gray-200 p-4`}
-      >
-        <input
-          className={`border-2 `}
-          value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-          }}
-        />
-        <button onClick={createRoom}>save</button>
-        <button
-          onClick={() => {
-            resetFalse();
-          }}
-        >
-          cancel
-        </button>
-      </div>
-    </>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { Room } from "@prisma/client";
 import { type NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { api } from "~/utils/api";
 import * as _ from "lodash";
@@ -13,6 +13,11 @@ import CreateRooms from "~/components/createRoom";
 
 export const TenMillion = 100000000;
 const Home: NextPage = () => {
+  const [skeletonRoomLength] = useState(() => {
+    const length =
+      parseInt(localStorage.getItem("skeletonRoomLength") as string) || 2;
+    return Math.min(length, 8);
+  });
   const utils = api.useContext();
   const userInfo = useInfo((state) => state.userInfo);
   const {
@@ -42,9 +47,7 @@ const Home: NextPage = () => {
    * on for checking if someone else is not editing another room
    * edit for Opening edit
    */
-  const [title, setTitle] = useState("");
   const [on, setOn] = useState(false);
-  const [edit, setEdit] = useState(false);
   useEffect(() => {
     void refetch();
   }, []);
@@ -53,12 +56,10 @@ const Home: NextPage = () => {
     if (!isLoading && JSON.stringify([]) === JSON.stringify(rooms)) {
       setHasMore(false);
     }
-  }, [isLoading]);
-  function resetFalse() {
-    setEdit(false);
-    setOn(false);
-    setTitle("");
-  }
+    if (rooms) {
+      localStorage.setItem("skeletonRoomLength", rooms.length.toString());
+    }
+  }, [isLoading, rooms]);
 
   function NextRooms() {
     if (rooms) {
@@ -72,15 +73,14 @@ const Home: NextPage = () => {
   }
 
   if (!rooms) {
+    const allSkeleton = new Array(skeletonRoomLength).fill(0);
     return (
       <>
         <CreateRooms on={on} setOn={setOn} />
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
+
+        {allSkeleton.map((_, index) => (
+          <Skeleton key={index} />
+        ))}
       </>
     );
   }
@@ -88,7 +88,6 @@ const Home: NextPage = () => {
   return (
     <div className="m-auto max-w-[800px]">
       <CreateRooms on={on} setOn={setOn} />
-      <div>rooms</div>
       <InfiniteScroll
         dataLength={rooms.length}
         next={NextRooms}

@@ -2,7 +2,7 @@ export default function Skeleton() {
   return (
     <div
       role="status"
-      className="m-auto mt-2  max-w-[800px] animate-pulse space-y-4 divide-y divide-gray-200 rounded border border-gray-200 p-4 shadow dark:divide-gray-700 dark:border-gray-700 md:p-6"
+      className="m-auto my-2  max-w-[800px] animate-pulse space-y-4 divide-y divide-gray-200 rounded border border-gray-200 p-4 shadow dark:divide-gray-700 dark:border-gray-700 md:p-6"
     >
       <div className=" flex items-center justify-between">
         <div>
