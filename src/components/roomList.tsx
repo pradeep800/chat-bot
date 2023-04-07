@@ -86,7 +86,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
         void router.push(`/${room.roomId}`);
       }}
     >
-      <div className="mr-auto">
+      <div className="mr-4 sm:mr-auto">
         <div className={`${edit ? "hidden" : "block"} text-xl font-bold `}>
           {room.title}
         </div>
@@ -94,7 +94,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
           ref={inputRef}
           className={`${
             edit ? "block" : "hidden"
-          }  w-[100%] text-xl font-bold focus:border-transparent focus:outline-none `}
+          }   w-[100%] text-xl font-bold focus:border-transparent focus:outline-none `}
           value={title}
           onClick={(e) => {
             e.stopPropagation();

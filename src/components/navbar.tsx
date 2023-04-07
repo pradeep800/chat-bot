@@ -6,7 +6,6 @@ import { auth } from "~/utils/firebase";
 import Link from "next/link";
 import Image from "next/image";
 export default function Navbar() {
-  const setUserInfo = useInfo((state) => state.setUserInfo);
   const userInfo = useInfo((state) => state.userInfo);
 
   function SignInClick() {
