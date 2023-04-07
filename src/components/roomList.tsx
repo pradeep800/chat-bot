@@ -76,7 +76,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
 
   return (
     <div
-      className=" my-2 flex items-center rounded border border-gray-200 p-4 md:p-6"
+      className=" md:p-6 my-2 flex items-center rounded border border-gray-200 p-4"
       onClick={(e) => {
         if (room.roomId === TenMillion) {
           toast.error("Please Wait...");
@@ -86,7 +86,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
         void router.push(`/${room.roomId}`);
       }}
     >
-      <div className="mr-4 sm:mr-auto">
+      <div className="mr-auto">
         <div className={`${edit ? "hidden" : "block"} text-xl font-bold `}>
           {room.title}
         </div>
@@ -121,7 +121,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
       >
         {room.roomId !== TenMillion && (
           <button
-            className={`${edit ? "hidden" : "flex"} `}
+            className={`${edit ? "hidden" : "flex"} p-2 `}
             onClick={(e) => {
               e.stopPropagation();
               if (!on) {
@@ -137,6 +137,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
 
         <div className={`${edit ? "flex" : "hidden"} gap-2 `}>
           <button
+            className="p-2"
             onClick={(e) => {
               e.stopPropagation();
               editMutation({ roomId: room.roomId, title });
@@ -146,6 +147,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
             save
           </button>
           <button
+            className="p-2"
             onClick={(e) => {
               e.stopPropagation();
               resetFalse();
