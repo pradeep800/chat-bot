@@ -3,10 +3,16 @@ import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { api } from "~/utils/api";
 import { TenMillion } from "~/pages";
+import cancelPhoto from "~/images/cancel.png";
+import deletePhoto from "~/images/delete.png";
+import editPhoto from "~/images/edit.png";
+import savePhoto from "~/images/save.png";
+
 import { toast } from "react-hot-toast";
 import { useInfo } from "~/utils/userInfoStore";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
+import Image from "next/image";
 interface RoomListSchema {
   room: Room;
   on: boolean;
@@ -54,7 +60,22 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
       toast.error("Unable To Update The Title");
     },
   });
-
+  const { mutate: deleteRoom } = api.rooms.deleteRoom.useMutation({
+    onMutate: (deletedRoom) => {
+      const prevRoom = utils.rooms.get15Rooms.getData();
+      const optimisticUpdate = prevRoom?.filter((oldRoom) => {
+        return oldRoom.roomId !== room.roomId;
+      });
+      utils.rooms.get15Rooms.setData(undefined, () => optimisticUpdate);
+      return { prevRoom };
+    },
+    onError: (err, notDeletedRoom, ctx) => {
+      toast.error("Unable To Delete Rooms");
+      if (ctx && ctx.prevRoom) {
+        utils.rooms.get15Rooms.setData(undefined, () => ctx.prevRoom);
+      }
+    },
+  });
   const [title, setTitle] = useState(room.title);
   const [edit, setEdit] = useState(false);
   const resetTrue = () => {
@@ -73,7 +94,12 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
       inputRef.current.focus();
     }
   }, [edit]);
-
+  function Delete() {
+    const is = confirm("Are You Sure You want To Delete This Room");
+    if (is) {
+      deleteRoom({ roomId: room.roomId });
+    }
+  }
   return (
     <div
       className=" md:p-6 my-2 flex items-center rounded border border-gray-200 p-4"
@@ -120,23 +146,34 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
         }}
       >
         {room.roomId !== TenMillion && (
-          <button
-            className={`${edit ? "hidden" : "flex"} p-2 `}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!on) {
-                resetTrue();
-              } else {
-                toast.error("You Cannot Update Multiple Rooms At Same Time");
-              }
-            }}
-          >
-            Edit
-          </button>
+          <div className="flex gap-1">
+            <button
+              title="Button For Editing the Room Details"
+              className={`${edit ? "hidden" : "flex"} p-2 `}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!on) {
+                  resetTrue();
+                } else {
+                  toast.error("You Cannot Update Multiple Rooms At Same Time");
+                }
+              }}
+            >
+              <Image src={editPhoto} alt="edit button" width={30} />
+            </button>
+            <button
+              title="Button For Delete The Room"
+              onClick={Delete}
+              className={`${edit ? "hidden" : "flex"} p-2 `}
+            >
+              <Image src={deletePhoto} alt="delete button photo" width={30} />
+            </button>
+          </div>
         )}
 
         <div className={`${edit ? "flex" : "hidden"} gap-2 `}>
           <button
+            title="Button For Saving The Changes"
             className="p-2"
             onClick={(e) => {
               e.stopPropagation();
@@ -144,16 +181,17 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
               resetFalse();
             }}
           >
-            save
+            <Image src={savePhoto} alt="save button Photo" width={30} />
           </button>
           <button
+            title="Button For Canceling The Changes"
             className="p-2"
             onClick={(e) => {
               e.stopPropagation();
               resetFalse();
             }}
           >
-            cancel
+            <Image src={cancelPhoto} alt="cancel button Photo" width={30} />
           </button>
         </div>
       </div>

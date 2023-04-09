@@ -16,66 +16,53 @@ export const conversations = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const roomInfo = await prisma.room.findUnique({
-        where: { roomId: input.roomId },
+      const { roomId } = input;
+      const last14Messages = await prisma.message.findMany({
+        where: { roomId },
+        orderBy: { messageId: "desc" },
+        take: 16,
       });
+      const last14MessagesReverse = [...last14Messages].reverse();
+      let conversation = ``;
 
-      let summery = "";
-      if (roomInfo) {
-        summery = `old qna summery is :-${roomInfo.summery} and your new question is :- ${input.question} ? most of the time use your own information but if needed give answer from old qna summery`;
-      }
-
+      last14MessagesReverse.map((message) => {
+        if (message.writer === "you") {
+          conversation += `question:-${message.text}?
+`;
+        } else {
+          conversation += `answer:-${message.text}
+`;
+        }
+      });
+      conversation += `question:-${input.question}?
+answer:-`;
       const res = await api.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [
           {
             role: "user",
-            content: `${summery}  give answer as small as you can`,
-          },
-        ],
-        max_tokens: 100,
-      });
-
-      const resText = res.data.choices[0]?.message?.content || "";
-      if (!roomInfo) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
-      const newSummery = await api.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: `write a summery for old qna:- ${roomInfo.summery} and new question ${input.question}  and answer is ${resText}  write summery as so you can understand whole context of before conversation`,
+            content: conversation,
           },
         ],
         max_tokens: 150,
       });
-
-      const mixData = await prisma.$transaction([
+      const [newQuestion, newAnswer] = await prisma.$transaction([
         prisma.message.create({
           data: {
-            roomId: input.roomId,
+            roomId,
             text: input.question,
             writer: "you",
           },
         }),
-        prisma.room.update({
-          where: { roomId: input.roomId },
-          data: {
-            summery: newSummery.data.choices[0]?.message?.content,
-          },
-        }),
         prisma.message.create({
           data: {
-            roomId: input.roomId,
-            text: resText,
+            roomId,
             writer: "server",
+            text: res.data.choices[0]?.message?.content as string,
           },
         }),
       ]);
-      const serverResponse = mixData[2];
-
-      return serverResponse;
+      return newAnswer;
     }),
   //check if every auth can excess this or not
   infiniteMessage: authProcedure

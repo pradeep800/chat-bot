@@ -175,49 +175,52 @@ export default function Pages() {
     setQuestion("");
     setIsAsking(true);
   }
-
+  console.log(chatPages?.pages[0]);
   return (
     <div className="m-auto  max-w-[800px]">
       <div>
-        {!chatPages?.pages?.length && (
-          <div className="flex h-[70vh] items-center justify-center text-lg font-bold text-blue-500 ">
+        {JSON.stringify(chatPages?.pages[0]) === "[]" && (
+          <div className="flex h-[85vh] items-center justify-center text-lg font-bold text-blue-500 ">
             No Conversation Yet
           </div>
         )}
       </div>
-      {isFetchingNextPage && <Loading />}
-      <div className="flex flex-col-reverse">
-        {chatPages?.pages?.map((messages, indexOfPage) => {
-          return messages.map((message, index) => {
-            if (
-              Math.min(messages.length, 10) === index + 1 &&
-              chatPages.pages.length === indexOfPage + 1
-            ) {
-              return (
-                <Messages
-                  key={message.messageId}
-                  message={message}
-                  ref={lastMessage}
-                />
-              );
-            }
-            return <Messages key={message.messageId} message={message} />;
-          });
-        })}
-      </div>
-
-      <div ref={lastDiv} className="h-10">
-        .
-      </div>
-      <div className="lg:w-[60%] lg:translate-x-[35%] fixed bottom-1 left-0   flex w-[80%] translate-x-[10%] gap-3  bg-white   ">
+      {isFetchingNextPage && <Loading />}{" "}
+      {JSON.stringify(chatPages?.pages[0]) !== "[]" && (
+        <div className="flex min-h-[85vh] flex-col-reverse">
+          {chatPages?.pages?.map((messages, indexOfPage) => {
+            return messages.map((message, index) => {
+              if (
+                Math.min(messages.length, 10) === index + 1 &&
+                chatPages.pages.length === indexOfPage + 1
+              ) {
+                return (
+                  <Messages
+                    key={message.messageId}
+                    message={message}
+                    ref={lastMessage}
+                  />
+                );
+              }
+              return <Messages key={message.messageId} message={message} />;
+            });
+          })}
+        </div>
+      )}
+      <div ref={lastDiv} className=""></div>
+      <div className="sticky bottom-0  flex w-[100%] justify-center gap-2 bg-white ">
         <input
-          className="  grow-[2] border-2 p-2"
+          placeholder="Write Your question"
+          className="md:m-2 my-1 grow-[2] rounded border-2 p-2 focus:outline-none "
           value={question}
           onChange={(e) => {
             setQuestion(e.target.value);
           }}
         />
-        <button className={` grow-[1] bg-blue-300 p-2`} onClick={askQuestion}>
+        <button
+          className={`md:m-2 my-1 grow-[1] rounded bg-blue-300 `}
+          onClick={askQuestion}
+        >
           {isAsking ? "..." : "Ask"}
         </button>
       </div>
