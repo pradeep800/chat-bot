@@ -13,9 +13,9 @@ export default function Navbar() {
     void signInWithPopup(auth, provider);
   }
   return (
-    <nav className="flex">
+    <nav className="sticky top-0 flex bg-white p-1">
       <Link className="mr-auto" href="/">
-        <div className="mr-auto">Chat</div>
+        <div className="mr-auto p-1 text-2xl font-bold">Chat</div>
       </Link>
 
       {userInfo.email ? (
@@ -27,20 +27,20 @@ export default function Navbar() {
             width={40}
             height={40}
           />
-          <div
+          <button
             className="rounded bg-red-300 p-2 hover:bg-red-400"
             onClick={() => void signOut(auth)}
           >
             SignOut
-          </div>
+          </button>
         </div>
       ) : (
-        <div
+        <button
           className="rounded bg-blue-300 px-3 py-2 hover:bg-blue-400"
           onClick={SignInClick}
         >
           Login
-        </div>
+        </button>
       )}
     </nav>
   );

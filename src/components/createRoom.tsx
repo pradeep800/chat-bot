@@ -5,13 +5,7 @@ import { TenMillion } from "~/pages";
 import { api } from "~/utils/api";
 import { useInfo } from "~/utils/userInfoStore";
 
-export default function CreateRooms({
-  on,
-  setOn,
-}: {
-  on: boolean;
-  setOn: (on: boolean) => void;
-}) {
+export default function CreateRooms() {
   const utils = api.useContext();
   const userInfo = useInfo((state) => state.userInfo);
   const [title, setTitle] = useState("");
@@ -61,7 +55,7 @@ export default function CreateRooms({
           setTitle(e.target.value);
         }}
       />
-      <div
+      <button
         className="rounded bg-slate-300 p-1 hover:bg-slate-400"
         onClick={() => {
           if (title) {
@@ -72,7 +66,7 @@ export default function CreateRooms({
         }}
       >
         addRoom
-      </div>
+      </button>
     </div>
   );
 }

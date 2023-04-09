@@ -51,7 +51,7 @@ export const conversations = createTRPCRouter({
         max_tokens: 150,
       });
 
-      await prisma.$transaction([
+      const mixData = await prisma.$transaction([
         prisma.message.create({
           data: {
             roomId: input.roomId,
@@ -73,21 +73,35 @@ export const conversations = createTRPCRouter({
           },
         }),
       ]);
+      const serverResponse = mixData[2];
 
-      return res.data;
+      return serverResponse;
     }),
-  allMessageOfRoom: authProcedure
-    .input(z.object({ roomId: z.number() }))
+  //check if every auth can excess this or not
+  infiniteMessage: authProcedure
+    .input(z.object({ roomId: z.number(), cursor: z.number().optional() }))
+
     .query(({ input }) => {
+      const { roomId, cursor: cursorId } = input;
+      /*
+       * When cursor exists
+       */
+      if (!cursorId) {
+        return prisma.message.findMany({
+          where: { roomId },
+          take: 14,
+          orderBy: [{ messageId: "desc" }],
+        });
+      }
+      /*
+       * When cursor does not exits
+       */
       return prisma.message.findMany({
-        where: { roomId: input.roomId },
+        where: { roomId },
+        orderBy: [{ messageId: "desc" }],
+        cursor: { messageId: cursorId },
+        skip: 1,
+        take: 14,
       });
     }),
-  //remove it afterward
-  example: authProcedure.query(async ({ ctx }) => {
-    // await prisma.room.deleteMany();
-    // await prisma.user.deleteMany();
-    // await prisma.message.deleteMany();
-    // return prisma.room.findMany({ select: { coversations: true } });
-  }),
 });

@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { api } from "~/utils/api";
 import * as _ from "lodash";
-import { useInfo } from "~/utils/userInfoStore";
 import RoomList from "~/components/roomList";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { noOfRoomForPagination } from "~/staticVeriable/paginationRoom";
 import Skeleton from "~/components/skeleton";
 import CreateRooms from "~/components/createRoom";
+import Loading from "~/components/loading";
 
 export const TenMillion = 100000000;
 const Home: NextPage = () => {
@@ -76,7 +76,7 @@ const Home: NextPage = () => {
     return (
       <>
         <div className="mx-auto max-w-[800px]">
-          <CreateRooms on={on} setOn={setOn} />
+          <CreateRooms />
           {allSkeleton.map((_, index) => (
             <Skeleton key={index} />
           ))}
@@ -87,12 +87,12 @@ const Home: NextPage = () => {
 
   return (
     <div className="m-auto max-w-[800px]">
-      <CreateRooms on={on} setOn={setOn} />
+      <CreateRooms />
       <InfiniteScroll
         dataLength={rooms.length}
         next={NextRooms}
         hasMore={hasMore}
-        loader={<div>loading...</div>}
+        loader={<Loading />}
         endMessage={<div></div>}
       >
         {rooms.map((room) => {
