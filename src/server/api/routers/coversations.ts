@@ -19,6 +19,7 @@ export const conversations = createTRPCRouter({
       const roomInfo = await prisma.room.findUnique({
         where: { roomId: input.roomId },
       });
+
       let summery = "";
       if (roomInfo) {
         summery = `old qna summery is :-${roomInfo.summery} and your new question is :- ${input.question} ? most of the time use your own information but if needed give answer from old qna summery`;
