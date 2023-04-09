@@ -49,8 +49,9 @@ export default function Pages() {
       });
 
       const prev = prevPages?.pages[0];
-      if (!prev) return;
-
+      if (!prev) {
+        return;
+      }
       const optimisticMessages = [
         {
           createdAt: new Date(Date.now()),
@@ -77,12 +78,22 @@ export default function Pages() {
         () => updatedPages
       );
       setScrollDown("down");
-      return { prevPages };
     },
-    onError(err, newTodo, ctx) {
+    onError(err, newMessage, ctx) {
       toast.error("There is some kind of server error");
       setScrollDown("down");
-      return ctx?.prevPages;
+      setIsAsking(false);
+      // console.log(ctx.prevPages);
+
+      utils.conversations.infiniteMessage.setInfiniteData(
+        { roomId: newMessage.roomId },
+        (old) => {
+          old?.pages[0]?.shift();
+          old?.pages[0]?.shift();
+          console.log(old);
+          return old;
+        }
+      );
     },
   });
   /*
