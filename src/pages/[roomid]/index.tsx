@@ -49,7 +49,7 @@ export default function Pages() {
       const prevPages = utils.conversations.infiniteMessage.getInfiniteData({
         roomId: message.roomId,
       });
-      setScrollDown("down");
+
       const prev = prevPages?.pages[0];
       if (!prev) {
         return;
@@ -79,6 +79,7 @@ export default function Pages() {
         { roomId: message.roomId },
         () => updatedPages
       );
+      setScrollDown("down");
     },
     onError(err, newMessage, ctx) {
       toast.error("There is some kind of server error");
