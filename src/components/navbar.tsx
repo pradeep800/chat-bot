@@ -15,7 +15,7 @@ export default function Navbar() {
   return (
     <nav
       style={{ background: "rgba(255, 255, 255, 0.9)" }}
-      className="sticky top-0 flex bg-white p-1"
+      className=" sticky top-0 flex bg-white p-1"
     >
       <Link className="mr-auto" href="/">
         <div className="mr-auto p-1 text-2xl font-bold">Chat</div>

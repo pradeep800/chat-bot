@@ -1,5 +1,6 @@
 import { Room } from "@prisma/client";
-import { useState } from "react";
+import _ from "lodash";
+import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import { TenMillion } from "~/pages";
 import { api } from "~/utils/api";
@@ -43,7 +44,21 @@ export default function CreateRooms() {
       toast.error("Unable To Create Room");
     },
   });
-
+  /*
+   * Search Mutation
+   */
+  const { mutate: searchForTitle } = api.rooms.searchRooms.useMutation({
+    onSuccess: (foundRooms) => {
+      console.log(foundRooms);
+    },
+  });
+  const searchRoom = useCallback(
+    _.debounce((title: string) => {
+      console.log(title);
+      searchForTitle({ substring: title });
+    }, 500),
+    []
+  );
   function createRoom() {
     createRoomMutation({ title: title });
     setTitle("");
@@ -57,6 +72,7 @@ export default function CreateRooms() {
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
+          searchRoom(e.target.value);
         }}
       />
       <button

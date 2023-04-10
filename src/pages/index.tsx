@@ -95,7 +95,6 @@ const Home: NextPage = () => {
         next={NextRooms}
         hasMore={hasMore}
         loader={<Loading />}
-        inverse={false}
       >
         {rooms.map((room) => {
           return (

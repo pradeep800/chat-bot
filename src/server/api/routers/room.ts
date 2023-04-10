@@ -84,4 +84,15 @@ export const rooms = createTRPCRouter({
       });
       return deletedRoom;
     }),
+  searchRooms: authProcedure
+    .input(z.object({ substring: z.string() }))
+    .mutation(({ input, ctx }) => {
+      const { substring } = input;
+      const { userId } = ctx.userInfo;
+      return prisma.room.findMany({
+        where: { userId, title: { contains: substring } },
+        orderBy: { updatedAt: "desc" },
+        take: 15,
+      });
+    }),
 });

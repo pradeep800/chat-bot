@@ -77,6 +77,12 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
   });
   const [title, setTitle] = useState(room.title);
   const [edit, setEdit] = useState(false);
+  useEffect(() => {
+    if (inputRef.current && edit) {
+      // If input element exists and edit mode is on, focus on the input element
+      inputRef.current.focus();
+    }
+  }, [edit]);
 
   const resetTrue = () => {
     setEdit(true);
@@ -97,7 +103,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
   }
   return (
     <div
-      className=" md:p-6 my-2 flex items-center rounded border border-gray-200 p-4"
+      className=" my-2 flex items-center rounded border border-gray-200 p-4 md:p-6"
       onClick={(e) => {
         if (room.roomId === TenMillion) {
           toast.error("Please Wait...");
@@ -107,7 +113,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
         void router.push(`/${room.roomId}`);
       }}
     >
-      <div className="mr-auto">
+      <div className=" mr-auto">
         <div className={`${edit ? "hidden" : "block"} text-xl font-bold `}>
           {room.title}
         </div>
@@ -145,18 +151,29 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
                 if (!on) {
                   resetTrue();
                 } else {
-                  toast.error("You Cannot Update Multiple Rooms At Same Time");
+                  toast.error("You Cannot Edit Multiple Rooms At Same Time");
                 }
               }}
             >
-              <Image src={editPhoto} alt="edit button" width={30} />
+              <Image
+                className="w-5 sm:w-7"
+                src={editPhoto}
+                alt="edit button"
+                width={30}
+              />
             </button>
             <button
               title="Button For Delete The Room"
               onClick={Delete}
-              className={`${edit ? "hidden" : "flex"} p-2 `}
+              className={`${edit ? "hidden" : "flex"}  p-2`}
             >
-              <Image src={deletePhoto} alt="delete button photo" width={30} />
+              <Image
+                className="w-5 sm:w-7"
+                placeholder="blur"
+                src={deletePhoto}
+                alt="delete button photo"
+                // width={30}
+              />
             </button>
           </div>
         )}
@@ -171,7 +188,12 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
               resetFalse();
             }}
           >
-            <Image src={savePhoto} alt="save button Photo" width={30} />
+            <Image
+              className="w-5 sm:w-7"
+              src={savePhoto}
+              alt="save button Photo"
+              width={30}
+            />
           </button>
           <button
             title="Button For Canceling The Changes"
@@ -181,7 +203,12 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
               resetFalse();
             }}
           >
-            <Image src={cancelPhoto} alt="cancel button Photo" width={30} />
+            <Image
+              className="w-5 sm:w-7"
+              src={cancelPhoto}
+              alt="cancel button Photo"
+              width={30}
+            />
           </button>
         </div>
       </div>

@@ -146,15 +146,36 @@ export default function Pages() {
 
   useLayoutEffect(() => {
     if (chatPages?.pages.length === 1) {
-      lastDiv.current?.scrollIntoView();
+      lastDiv.current?.scrollIntoView({ inline: "nearest" });
     }
   }, [chatPages]);
   useEffect(() => {
     if (scrollDown === "down") {
-      lastDiv.current?.scrollIntoView({ behavior: "smooth" });
+      lastDiv.current?.scrollIntoView({
+        behavior: "smooth",
+      });
       setScrollDown("not-down");
     }
   }, [scrollDown]);
+  useEffect(() => {
+    console.log(hasNextPage);
+    if (hasNextPage) {
+      const onScroll = (e: Event) => {
+        const scrollTop =
+          window.pageYOffset || document.documentElement.scrollTop;
+        const maxScrollTop = 50;
+
+        if (scrollTop < maxScrollTop) {
+          window.scrollTo(0, maxScrollTop);
+        }
+      };
+      addEventListener("scroll", onScroll);
+      return () => {
+        removeEventListener("scroll", onScroll);
+      };
+    }
+  }, [hasNextPage]);
+
   if (isLoading) {
     return <Loading />;
   }
@@ -174,7 +195,7 @@ export default function Pages() {
     setIsAsking(true);
   }
   return (
-    <div className="m-auto  max-w-[800px]">
+    <div className="m-auto  max-w-[800px] ">
       <div>
         {JSON.stringify(chatPages?.pages[0]) === "[]" && (
           <div className="flex h-[85vh] items-center justify-center text-lg font-bold text-blue-500 ">
@@ -208,14 +229,14 @@ export default function Pages() {
       <div className="sticky bottom-0  flex w-[100%] justify-center gap-2 bg-white ">
         <input
           placeholder="Write Your question"
-          className="md:m-2 my-1 grow-[2] rounded border-2 p-2 focus:outline-none "
+          className="my-1 grow-[2] rounded border-2 p-2 focus:outline-none md:m-2 "
           value={question}
           onChange={(e) => {
             setQuestion(e.target.value);
           }}
         />
         <button
-          className={`md:m-2 my-1 grow-[1] rounded bg-blue-300 `}
+          className={`my-1 grow-[1] rounded bg-blue-300 md:m-2 `}
           onClick={askQuestion}
         >
           {isAsking ? "..." : "Ask"}

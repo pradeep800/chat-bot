@@ -24,7 +24,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     );
   }
   return (
-    <div className={`m-1 md:m-3 ${nunito.className} text-lg font-medium`}>
+    <div className={`md:m-3 m-1 ${nunito.className} text-lg font-medium`}>
       <Navbar />
       <CheckAuth>
         <Component {...pageProps} />
