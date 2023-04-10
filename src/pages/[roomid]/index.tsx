@@ -153,7 +153,7 @@ export default function Pages() {
   }, [chatPages]);
   useEffect(() => {
     if (scrollDown === "down") {
-      let timeout = setTimeout(() => {
+      const timeout = setTimeout(() => {
         lastDiv.current?.scrollIntoView({
           behavior: "smooth",
         });
