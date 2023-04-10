@@ -177,7 +177,7 @@ export default function Pages() {
   }, [hasNextPage]);
 
   if (isLoading) {
-    return <Loading />;
+    return <Loading hidden />;
   }
   /*
    * asking question

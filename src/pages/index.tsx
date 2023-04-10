@@ -94,7 +94,7 @@ const Home: NextPage = () => {
         dataLength={rooms.length}
         next={NextRooms}
         hasMore={hasMore}
-        loader={<Loading />}
+        loader={<Loading hidden />}
       >
         {rooms.map((room) => {
           return (
