@@ -1,7 +1,7 @@
 export default function Loading({ hidden }: { hidden?: boolean }) {
   return (
     <>
-      <div hidden={hidden} className="h-[200px]"></div>
+      <div hidden={hidden} className="h-[50px]"></div>
       <div className="flex h-[50px] justify-center ">
         <div role="status">
           <svg

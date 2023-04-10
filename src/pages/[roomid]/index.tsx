@@ -163,7 +163,7 @@ export default function Pages() {
       const onScroll = (e: Event) => {
         const scrollTop =
           window.pageYOffset || document.documentElement.scrollTop;
-        const maxScrollTop = 50;
+        const maxScrollTop = 200;
 
         if (scrollTop < maxScrollTop) {
           window.scrollTo(0, maxScrollTop);
@@ -203,7 +203,11 @@ export default function Pages() {
           </div>
         )}
       </div>
-      {isFetchingNextPage && <Loading />}{" "}
+      {isFetchingNextPage && (
+        <>
+          <Loading />
+        </>
+      )}{" "}
       {JSON.stringify(chatPages?.pages[0]) !== "[]" && (
         <div className="flex min-h-[85vh] flex-col-reverse">
           {chatPages?.pages?.map((messages, indexOfPage) => {
