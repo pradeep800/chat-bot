@@ -183,7 +183,8 @@ export default function Pages() {
   /*
    * asking question
    */
-  function askQuestion() {
+  function askQuestion(e: SubmitEvent) {
+    e.preventDefault();
     if (isAsking) {
       toast.error("Wait For Previous Answer To Come");
       return;
@@ -232,7 +233,10 @@ export default function Pages() {
         </div>
       )}
       <div ref={lastDiv} className=""></div>
-      <div className="sticky bottom-0  flex w-[100%] justify-center gap-2 bg-white ">
+      <form
+        onSubmit={askQuestion}
+        className="sticky bottom-0  flex w-[100%] justify-center gap-2 bg-white "
+      >
         <input
           ref={askQuestionInput}
           placeholder="Write Your question"
@@ -242,13 +246,10 @@ export default function Pages() {
             setQuestion(e.target.value);
           }}
         />
-        <button
-          className={`my-1 grow-[1] rounded bg-blue-300 md:m-2 `}
-          onClick={askQuestion}
-        >
+        <button className={`my-1 grow-[1] rounded bg-blue-300 md:m-2 `}>
           {isAsking ? "..." : "Ask"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }
