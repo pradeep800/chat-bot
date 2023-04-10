@@ -153,10 +153,13 @@ export default function Pages() {
   }, [chatPages]);
   useEffect(() => {
     if (scrollDown === "down") {
-      lastDiv.current?.scrollIntoView({
-        behavior: "smooth",
-      });
-      setScrollDown("not-down");
+      let timeout = setTimeout(() => {
+        lastDiv.current?.scrollIntoView({
+          behavior: "smooth",
+        });
+        setScrollDown("not-down");
+      }, 1000);
+      return () => clearInterval(timeout);
     }
   }, [scrollDown]);
 
