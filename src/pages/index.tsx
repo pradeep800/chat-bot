@@ -68,6 +68,8 @@ const Home: NextPage = () => {
       } else {
         setHasMore(false);
       }
+    } else {
+      setHasMore(false);
     }
   }
 
@@ -93,7 +95,7 @@ const Home: NextPage = () => {
         next={NextRooms}
         hasMore={hasMore}
         loader={<Loading />}
-        endMessage={<div></div>}
+        inverse={false}
       >
         {rooms.map((room) => {
           return (

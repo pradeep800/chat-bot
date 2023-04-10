@@ -27,6 +27,7 @@ model Room {
   summery String @db.Text
   conversations Message[]
   @@index([userId])
+  @@index([title])
   @@index([updatedAt])
 }
 

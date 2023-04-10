@@ -83,14 +83,12 @@ export default function Pages() {
       toast.error("There is some kind of server error");
       setScrollDown("down");
       setIsAsking(false);
-      // console.log(ctx.prevPages);
 
       utils.conversations.infiniteMessage.setInfiniteData(
         { roomId: newMessage.roomId },
         (old) => {
           old?.pages[0]?.shift();
           old?.pages[0]?.shift();
-          console.log(old);
           return old;
         }
       );
@@ -175,7 +173,6 @@ export default function Pages() {
     setQuestion("");
     setIsAsking(true);
   }
-  console.log(chatPages?.pages[0]);
   return (
     <div className="m-auto  max-w-[800px]">
       <div>

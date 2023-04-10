@@ -46,7 +46,7 @@ answer:-`;
         ],
         max_tokens: 150,
       });
-      const [newQuestion, newAnswer] = await prisma.$transaction([
+      const [newQuestion, newAnswer, room] = await prisma.$transaction([
         prisma.message.create({
           data: {
             roomId,
@@ -61,7 +61,12 @@ answer:-`;
             text: res.data.choices[0]?.message?.content as string,
           },
         }),
+        prisma.room.update({
+          where: { roomId },
+          data: { updatedAt: new Date(Date.now()) },
+        }),
       ]);
+      console.log(room);
       return newAnswer;
     }),
   //check if every auth can excess this or not

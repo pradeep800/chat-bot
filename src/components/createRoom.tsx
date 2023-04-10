@@ -3,10 +3,12 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { TenMillion } from "~/pages";
 import { api } from "~/utils/api";
+// import useRainbow from "~/utils/useRainbow";
 import { useInfo } from "~/utils/userInfoStore";
 
 export default function CreateRooms() {
   const utils = api.useContext();
+  // const colors = useRainbow({ intervalDelay: 100 });
   const userInfo = useInfo((state) => state.userInfo);
   const [title, setTitle] = useState("");
   const { mutate: createRoomMutation } = api.rooms.createRoom.useMutation({
@@ -46,10 +48,12 @@ export default function CreateRooms() {
     createRoomMutation({ title: title });
     setTitle("");
   }
+  // const colorKeys = Object.keys(colors);
   return (
-    <div className="my-5 mt-8 flex justify-center">
+    <div className="my-5 mt-6 flex justify-center">
       <input
-        className={`mr-3 rounded border-2`}
+        placeholder="Create Room & Search"
+        className={`mr-3 grow-[1] rounded border-2 p-1`}
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
@@ -57,6 +61,21 @@ export default function CreateRooms() {
       />
       <button
         className="rounded bg-slate-300 p-1 hover:bg-slate-400"
+        // style={{
+        //   transition: `
+        //   ${colorKeys[0]} ${100}ms linear,
+        //   ${colorKeys[1]} ${100}ms linear,
+        //   ${colorKeys[2]} ${100}ms linear
+        // `,
+        //   background: `
+        //   radial-gradient(
+        //     circle at top left,
+        //     var(${colorKeys[2]}),
+        //     var(${colorKeys[1]}),
+        //     var(${colorKeys[0]})
+        //   )
+        // `,
+        // }}
         onClick={() => {
           if (title) {
             createRoom();
@@ -65,7 +84,7 @@ export default function CreateRooms() {
           }
         }}
       >
-        addRoom
+        Create Room
       </button>
     </div>
   );

@@ -35,7 +35,6 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
     },
     onMutate: (changedRoomTitle) => {
       const prevRooms = utils.rooms.get15Rooms.getData();
-      //TODO Change roomId
 
       const changedRoom = {
         roomId: TenMillion, //fake for now
@@ -78,6 +77,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
   });
   const [title, setTitle] = useState(room.title);
   const [edit, setEdit] = useState(false);
+
   const resetTrue = () => {
     setEdit(true);
     setOn(true);
@@ -88,12 +88,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
     setOn(false);
     setTitle(room.title);
   };
-  useEffect(() => {
-    if (inputRef.current && edit) {
-      // If input element exists and edit mode is on, focus on the input element
-      inputRef.current.focus();
-    }
-  }, [edit]);
+
   function Delete() {
     const is = confirm("Are You Sure You want To Delete This Room");
     if (is) {
@@ -129,12 +124,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
             setTitle(e.target.value);
           }}
         />
-        <div
-          className="mr-auto text-base"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
+        <div className="mr-auto text-base">
           {dayjs(room.updatedAt).fromNow()}
         </div>
       </div>
