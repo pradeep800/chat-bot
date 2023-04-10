@@ -1,7 +1,7 @@
 import { type AppType } from "next/app";
 
 import { api } from "~/utils/api";
-
+import waitingSpunchBob from "~/images/spunchBobWaiting.gif";
 import "~/styles/globals.css";
 import Navbar from "~/components/navbar";
 import CheckAuth from "~/components/checkAuth";
@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import { useInfo } from "~/utils/userInfoStore";
 import { useAuth } from "~/utils/useAuth";
 import { Nunito } from "next/font/google";
+import Image from "next/image";
 const nunito = Nunito({ subsets: ["cyrillic"], weight: "variable" });
 const MyApp: AppType = ({ Component, pageProps }) => {
   const loading = useInfo((state) => state.loading);
@@ -18,13 +19,16 @@ const MyApp: AppType = ({ Component, pageProps }) => {
    */
   if (loading) {
     return (
-      <div className="flex h-[90vh] w-[100vw] items-center justify-center">
-        Checking Login....
+      <div
+        className={`flex h-[100%] w-[100vw] flex-col items-center justify-center gap-3 ${nunito.className} text-2xl font-bold`}
+      >
+        <Image className="p-2" src={waitingSpunchBob} alt="waiting Photo" />
+        <div className={``}>Checking Login....</div>
       </div>
     );
   }
   return (
-    <div className={`md:m-3 m-1 ${nunito.className} text-lg font-medium`}>
+    <div className={`mx-1 md:mx-3 ${nunito.className} text-lg font-medium`}>
       <Navbar />
       <CheckAuth>
         <Component {...pageProps} />

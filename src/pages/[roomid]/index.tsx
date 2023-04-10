@@ -158,8 +158,8 @@ export default function Pages() {
           behavior: "smooth",
         });
         setScrollDown("not-down");
-      }, 1000);
-      return () => clearInterval(timeout);
+      }, 200);
+      return () => clearTimeout(timeout);
     }
   }, [scrollDown]);
 

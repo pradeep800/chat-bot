@@ -24,6 +24,12 @@ export function useAuth() {
       mutate();
       return;
     }
+    if (!loading) {
+      let interval = setTimeout(() => {
+        setLoading(loading);
+      }, 3000);
+      return () => clearTimeout(interval);
+    }
     setLoading(loading);
   }, [user, loading]);
 }
