@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import {
+  FormEvent,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -183,7 +184,7 @@ export default function Pages() {
   /*
    * asking question
    */
-  function askQuestion(e: SubmitEvent) {
+  function askQuestion(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (isAsking) {
       toast.error("Wait For Previous Answer To Come");
