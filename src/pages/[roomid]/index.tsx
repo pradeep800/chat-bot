@@ -18,6 +18,7 @@ export default function Pages() {
   const lastDiv = useRef<HTMLDivElement>(null);
   const [scrollDown, setScrollDown] = useState("not-down");
   const [isAsking, setIsAsking] = useState(false);
+  const askQuestionInput = useRef<HTMLInputElement>(null);
   /*
    * It is for optimistic updates in data and asking question
    */
@@ -156,6 +157,7 @@ export default function Pages() {
       setScrollDown("not-down");
     }
   }, [scrollDown]);
+
   useEffect(() => {
     console.log(hasNextPage);
     if (hasNextPage) {
@@ -186,6 +188,7 @@ export default function Pages() {
       toast.error("Wait For Previous Answer To Come");
       return;
     }
+    askQuestionInput.current?.blur();
     mutate({
       roomId: roomId.current,
       question: question,
@@ -212,7 +215,7 @@ export default function Pages() {
           {chatPages?.pages?.map((messages, indexOfPage) => {
             return messages.map((message, index) => {
               if (
-                Math.min(messages.length, 10) === index + 1 &&
+                Math.min(messages.length, 6) === index + 1 &&
                 chatPages.pages.length === indexOfPage + 1
               ) {
                 return (
@@ -231,6 +234,7 @@ export default function Pages() {
       <div ref={lastDiv} className=""></div>
       <div className="sticky bottom-0  flex w-[100%] justify-center gap-2 bg-white ">
         <input
+          ref={askQuestionInput}
           placeholder="Write Your question"
           className="my-1 grow-[2] rounded border-2 p-2 focus:outline-none md:m-2 "
           value={question}
