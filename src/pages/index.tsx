@@ -74,7 +74,9 @@ const Home: NextPage = () => {
       setHasMore(false);
     }
   }
-
+  if (rooms && rooms.length === 0) {
+    return <div className="text-center">No Rooms</div>;
+  }
   if (!rooms) {
     const allSkeleton = new Array(skeletonRoomLength).fill(0);
     return (
