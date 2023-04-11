@@ -26,15 +26,15 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutate: editMutation } = api.rooms.editRoomTitle.useMutation({
     onSuccess: (updatedRoom) => {
-      const prevRooms = utils.rooms.get15Rooms.getData();
+      const prevRooms = utils.rooms.getRooms.getData();
       prevRooms?.shift();
-      utils.rooms.get15Rooms.setData(undefined, () => [
+      utils.rooms.getRooms.setData(undefined, () => [
         updatedRoom,
         ...(prevRooms ?? []),
       ]);
     },
     onMutate: (changedRoomTitle) => {
-      const prevRooms = utils.rooms.get15Rooms.getData();
+      const prevRooms = utils.rooms.getRooms.getData();
 
       const changedRoom = {
         roomId: TenMillion, //fake for now
@@ -46,7 +46,7 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
       const allRoomsWithoutUpdatedOne = prevRooms?.filter((roomData) => {
         return roomData.roomId !== room.roomId;
       });
-      utils.rooms.get15Rooms.setData(undefined, () => [
+      utils.rooms.getRooms.setData(undefined, () => [
         changedRoom,
         ...(allRoomsWithoutUpdatedOne ?? []),
       ]);
@@ -55,23 +55,23 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
       };
     },
     onError: (err, changedRoomTitle, ctx) => {
-      utils.rooms.get15Rooms.setData(undefined, () => ctx?.prevRooms);
+      utils.rooms.getRooms.setData(undefined, () => ctx?.prevRooms);
       toast.error("Unable To Update The Title");
     },
   });
   const { mutate: deleteRoom } = api.rooms.deleteRoom.useMutation({
     onMutate: (deletedRoom) => {
-      const prevRoom = utils.rooms.get15Rooms.getData();
+      const prevRoom = utils.rooms.getRooms.getData();
       const optimisticUpdate = prevRoom?.filter((oldRoom) => {
         return oldRoom.roomId !== room.roomId;
       });
-      utils.rooms.get15Rooms.setData(undefined, () => optimisticUpdate);
+      utils.rooms.getRooms.setData(undefined, () => optimisticUpdate);
       return { prevRoom };
     },
     onError: (err, notDeletedRoom, ctx) => {
       toast.error("Unable To Delete Rooms");
       if (ctx && ctx.prevRoom) {
-        utils.rooms.get15Rooms.setData(undefined, () => ctx.prevRoom);
+        utils.rooms.getRooms.setData(undefined, () => ctx.prevRoom);
       }
     },
   });
@@ -215,8 +215,3 @@ export default function RoomList({ room, on, setOn }: RoomListSchema) {
     </div>
   );
 }
-// const MemoizedRoom = memo(Room, (prevChat, NextChat) => {
-//   let res = _.isEqual(prevChat, NextChat);
-//   console.log(res);
-//   return res;
-// });

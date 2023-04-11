@@ -4,9 +4,13 @@ import { Message } from "postcss";
 import { z } from "zod";
 import { authProcedure, createTRPCRouter } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
+import { noOfMessageForPagination } from "~/staticVeriable/variable";
 const api = new OpenAIApi(
   new Configuration({ apiKey: process.env.OPENAI_KEY as string })
 );
+/*
+ * check if that room is belong to that person
+ */
 export async function checkIfItsHisRoom(roomId: number, userId: string) {
   const room = await prisma.room.findFirst({ where: { userId, roomId } });
   if (!room) {
@@ -26,12 +30,12 @@ export const conversations = createTRPCRouter({
       const { roomId } = input;
       const { userId } = ctx.userInfo;
       await checkIfItsHisRoom(roomId, userId);
-      const last14Messages = await prisma.message.findMany({
+      const last16Message = await prisma.message.findMany({
         where: { roomId },
         orderBy: { messageId: "desc" },
         take: 16,
       });
-      const last14MessagesReverse = [...last14Messages].reverse();
+      const last14MessagesReverse = [...last16Message].reverse();
       let conversation = ``;
 
       last14MessagesReverse.map((message) => {
@@ -87,23 +91,24 @@ answer:-`;
       await checkIfItsHisRoom(roomId, userId);
 
       /*
-       * When cursor exists
+       * When cursor does not exits send first noOfMessageForPagination
        */
       if (!cursorId) {
         return prisma.message.findMany({
           where: { roomId },
           orderBy: [{ messageId: "desc" }],
+          take: noOfMessageForPagination,
         });
       }
       /*
-       * When cursor does not exits
+       * When cursor exists send first noOfMessageForPagination
        */
       return prisma.message.findMany({
         where: { roomId },
         orderBy: [{ messageId: "desc" }],
         cursor: { messageId: cursorId },
         skip: 1,
-        take: 14,
+        take: noOfMessageForPagination,
       });
     }),
 });

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { noOfRoomForPagination } from "~/staticVeriable/paginationRoom";
+import { noOfRoomForPagination } from "~/staticVeriable/variable";
 import {
   authProcedure,
   createTRPCRouter,
@@ -12,31 +12,14 @@ import { checkIfItsHisRoom } from "./coversations";
  * TODO: Pagination
  */
 export const rooms = createTRPCRouter({
-  get15Rooms: authProcedure.query(async ({ ctx }) => {
+  getRooms: authProcedure.query(async ({ ctx }) => {
     const rooms = await prisma.room.findMany({
       where: { userId: ctx.userInfo.userId },
       orderBy: [{ updatedAt: "desc" }],
-      take: noOfRoomForPagination,
+      take: 10,
     });
     return rooms;
   }),
-  getNext15Rooms: authProcedure
-    .input(z.object({ cursorId: z.number() }))
-    .mutation(async ({ ctx, input }) => {
-      if (!input.cursorId) {
-        return [];
-      }
-      const rooms = await prisma.room.findMany({
-        where: { userId: ctx.userInfo.userId },
-        skip: 1,
-        orderBy: [{ updatedAt: "desc" }],
-        cursor: {
-          roomId: input.cursorId,
-        },
-        take: noOfRoomForPagination,
-      });
-      return rooms;
-    }),
 
   createRoom: authProcedure
     .input(z.object({ title: z.string() }))
@@ -99,7 +82,7 @@ export const rooms = createTRPCRouter({
       return prisma.room.findMany({
         where: { userId, title: { contains: substring } },
         orderBy: { updatedAt: "desc" },
-        take: 15,
+        take: noOfRoomForPagination,
       });
     }),
   nextSearchRooms: authProcedure

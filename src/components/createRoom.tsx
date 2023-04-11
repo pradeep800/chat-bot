@@ -1,26 +1,21 @@
 import { Room } from "@prisma/client";
 import _ from "lodash";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { TenMillion } from "~/pages";
-import { noOfRoomForPagination } from "~/staticVeriable/paginationRoom";
+import { noOfRoomForPagination } from "~/staticVeriable/variable";
 import { api } from "~/utils/api";
-// import useRainbow from "~/utils/useRainbow";
 import { useInfo } from "~/utils/userInfoStore";
 
 export default function CreateRooms({
   title,
   setTitle,
-  hasMore,
   setHasMore,
-  searching,
   setSearching,
 }: {
   title: string;
   setTitle: (str: string) => void;
-  hasMore: boolean;
   setHasMore: (has: boolean) => void;
-  searching: boolean;
   setSearching: (has: boolean) => void;
 }) {
   const utils = api.useContext();
@@ -32,7 +27,7 @@ export default function CreateRooms({
     onSuccess: (foundRooms) => {
       setSearching(false);
       setHasMore(foundRooms.length === noOfRoomForPagination ? true : false);
-      utils.rooms.get15Rooms.setData(undefined, foundRooms);
+      utils.rooms.getRooms.setData(undefined, foundRooms);
     },
   });
   /*
@@ -40,14 +35,13 @@ export default function CreateRooms({
    */
   const { mutate: createRoomMutation } = api.rooms.createRoom.useMutation({
     onSuccess: (data) => {
-      const prevRooms = utils.rooms.get15Rooms.getData();
+      const prevRooms = utils.rooms.getRooms.getData();
       prevRooms?.shift();
       const newRooms = [data, ...(prevRooms ?? [])];
-      utils.rooms.get15Rooms.setData(undefined, () => newRooms);
+      utils.rooms.getRooms.setData(undefined, () => newRooms);
       searchForTitle({ substring: title });
     },
     onMutate: (newRoomTitle) => {
-      //TODO Change room Id
       const newRoom = {
         roomId: TenMillion,
         title: newRoomTitle.title,
@@ -55,9 +49,8 @@ export default function CreateRooms({
         userId: userInfo.userId,
         updatedAt: new Date(Date.now()),
       } as Room;
-      const prevRooms = utils.rooms.get15Rooms.getData();
-      //check here
-      utils.rooms.get15Rooms.setData(undefined, (old) => [
+      const prevRooms = utils.rooms.getRooms.getData();
+      utils.rooms.getRooms.setData(undefined, (old) => [
         newRoom,
         ...(old || []),
       ]);
@@ -67,14 +60,13 @@ export default function CreateRooms({
       };
     },
     onError: (err, newRoomTitle, ctx) => {
-      utils.rooms.get15Rooms.setData(undefined, (old) => ctx?.prevRooms);
+      utils.rooms.getRooms.setData(undefined, (old) => ctx?.prevRooms);
       toast.error("Unable To Create Room");
     },
   });
 
   const searchRoom = useCallback(
     _.debounce((title: string) => {
-      console.log(title);
       searchForTitle({ substring: title });
     }, 500),
     []
@@ -87,7 +79,6 @@ export default function CreateRooms({
     createRoomMutation({ title: title });
     setTitle("");
   }
-  // const colorKeys = Object.keys(colors);
   return (
     <div className="my-5 mt-6 flex justify-center">
       <input

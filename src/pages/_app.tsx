@@ -10,6 +10,7 @@ import { useInfo } from "~/utils/userInfoStore";
 import { useAuth } from "~/utils/useAuth";
 import { Nunito } from "next/font/google";
 import Image from "next/image";
+import Head from "next/head";
 const nunito = Nunito({ subsets: ["cyrillic"], weight: "variable" });
 const MyApp: AppType = ({ Component, pageProps }) => {
   const loading = useInfo((state) => state.loading);
@@ -20,7 +21,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   if (loading) {
     return (
       <div
-        className={`flex h-[100%] w-[100vw] flex-col items-center justify-center gap-3 ${nunito.className} text-2xl font-bold`}
+        className={`flex h-[90%] w-[100vw] flex-col items-center justify-center gap-3 ${nunito.className} text-2xl font-bold`}
       >
         <Image className="p-2" src={waitingSpunchBob} alt="waiting Photo" />
         <div className={``}>Checking Login....</div>
@@ -28,7 +29,13 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     );
   }
   return (
-    <div className={`mx-1 md:mx-3 ${nunito.className} text-lg font-medium`}>
+    <div
+      className={`mx-1 h-[100%] md:mx-3 ${nunito.className} text-lg font-medium`}
+    >
+      <Head>
+        <title>Chat Application</title>
+        <link rel="icon" type="image/x-icon" href="/ai.png"></link>
+      </Head>
       <Navbar />
       <CheckAuth>
         <Component {...pageProps} />

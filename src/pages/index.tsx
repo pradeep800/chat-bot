@@ -1,16 +1,14 @@
 import { Room } from "@prisma/client";
 import { type NextPage } from "next";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "react-hot-toast";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import * as _ from "lodash";
 import RoomList from "~/components/roomList";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { noOfRoomForPagination } from "~/staticVeriable/paginationRoom";
+import { noOfRoomForPagination } from "~/staticVeriable/variable";
 import Skeleton from "~/components/skeleton";
 import CreateRooms from "~/components/createRoom";
 import Loading from "~/components/loading";
-
 export const TenMillion = 100000000;
 const Home: NextPage = () => {
   const [searching, setSearching] = useState(false);
@@ -21,11 +19,7 @@ const Home: NextPage = () => {
     return Math.min(length, 8);
   });
   const utils = api.useContext();
-  const {
-    data: rooms,
-    isLoading,
-    refetch,
-  } = api.rooms.get15Rooms.useQuery(undefined, {
+  const { data: rooms, isLoading } = api.rooms.getRooms.useQuery(undefined, {
     staleTime: Infinity,
     refetchOnMount: true,
   });
@@ -37,7 +31,7 @@ const Home: NextPage = () => {
   const { mutate: searchNextRooms } = api.rooms.nextSearchRooms.useMutation({
     onSuccess: (data) => {
       setHasMore(data.length === noOfRoomForPagination ? true : false);
-      utils.rooms.get15Rooms.setData(undefined, (oldRooms) => [
+      utils.rooms.getRooms.setData(undefined, (oldRooms) => [
         ...(oldRooms ?? []),
         ...data,
       ]);
@@ -49,9 +43,6 @@ const Home: NextPage = () => {
    * edit for Opening edit
    */
   const [on, setOn] = useState(false);
-  useEffect(() => {
-    void refetch();
-  }, []);
 
   useEffect(() => {
     if (!isLoading && JSON.stringify([]) === JSON.stringify(rooms)) {
@@ -83,9 +74,7 @@ const Home: NextPage = () => {
           <CreateRooms
             title={title}
             setTitle={setTitle}
-            hasMore={hasMore}
             setHasMore={setHasMore}
-            searching={searching}
             setSearching={setSearching}
           />
           {allSkeleton.map((_, index) => (
@@ -102,11 +91,9 @@ const Home: NextPage = () => {
         title={title}
         setTitle={setTitle}
         setHasMore={setHasMore}
-        hasMore={hasMore}
-        searching={searching}
         setSearching={setSearching}
       />
-      {searching && <div>searching...</div>}
+      {searching && <div className="text-center">searching...</div>}
       {rooms && rooms.length === 0 && (
         <div className="text-center">No Rooms</div>
       )}

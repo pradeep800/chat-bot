@@ -13,6 +13,9 @@ import Messages from "~/components/messages";
 import { toast } from "react-hot-toast";
 import Loading from "~/components/loading";
 import Forbidden from "~/components/forbidden";
+import Image from "next/image";
+import wait from "~/images/waiting.gif";
+import send from "~/images/send.png";
 export default function Pages() {
   const router = useRouter();
   const roomId = useRef<number>(parseInt(router.query.roomid as string));
@@ -166,7 +169,6 @@ export default function Pages() {
   }, [scrollDown]);
 
   useEffect(() => {
-    console.log(hasNextPage);
     if (hasNextPage) {
       const onScroll = (e: Event) => {
         const scrollTop =
@@ -245,7 +247,7 @@ export default function Pages() {
       <div ref={lastDiv} className=""></div>
       <form
         onSubmit={askQuestion}
-        className="sticky bottom-0  flex w-[100%] justify-center gap-2 bg-white "
+        className="sticky bottom-0  flex w-[100%] justify-center  bg-white "
       >
         <input
           ref={askQuestionInput}
@@ -256,8 +258,12 @@ export default function Pages() {
             setQuestion(e.target.value);
           }}
         />
-        <button className={`my-1 grow-[1] rounded bg-blue-300 md:m-2 `}>
-          {isAsking ? "..." : "Ask"}
+        <button className={`my-1  w-[30px] rounded sm:w-[50px] md:m-2 `}>
+          {isAsking ? (
+            <Image src={wait} className="w-[100%]" alt="waiting photo" />
+          ) : (
+            <Image src={send} className="w-[100%]" alt="sending photo" />
+          )}
         </button>
       </form>
     </div>
