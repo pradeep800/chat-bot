@@ -29,9 +29,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     );
   }
   return (
-    <div
-      className={`mx-1 h-[100%] md:mx-3 ${nunito.className} text-lg font-medium`}
-    >
+    <div className={`mx-1  md:mx-3 ${nunito.className} text-lg font-medium`}>
       <Head>
         <title>Chat Application</title>
         <link rel="icon" type="image/x-icon" href="/ai.png"></link>
