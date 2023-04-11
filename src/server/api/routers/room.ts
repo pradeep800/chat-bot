@@ -7,6 +7,7 @@ import {
 } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
 import { TRPCError } from "@trpc/server";
+import { checkIfItsHisRoom } from "./coversations";
 /*
  * TODO: Pagination
  */
@@ -53,6 +54,9 @@ export const rooms = createTRPCRouter({
     .input(z.object({ title: z.string(), roomId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const { roomId } = input;
+      const { userId } = ctx.userInfo;
+      await checkIfItsHisRoom(roomId, userId);
+
       const room = await prisma.room.update({
         where: { roomId: roomId },
         data: { title: input.title },
@@ -64,6 +68,8 @@ export const rooms = createTRPCRouter({
     .input(z.object({ roomId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const { roomId } = input;
+      const { userId } = ctx.userInfo;
+      await checkIfItsHisRoom(roomId, userId);
       const messages = await prisma.message.findMany({
         where: { roomId: roomId },
       });
@@ -106,7 +112,7 @@ export const rooms = createTRPCRouter({
         orderBy: { updatedAt: "desc" },
         cursor: { roomId: cursorId },
         skip: 1,
-        take: 15,
+        take: noOfRoomForPagination,
       });
     }),
 });

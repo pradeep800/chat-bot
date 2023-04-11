@@ -7,6 +7,13 @@ import { prisma } from "~/server/db";
 const api = new OpenAIApi(
   new Configuration({ apiKey: process.env.OPENAI_KEY as string })
 );
+export async function checkIfItsHisRoom(roomId: number, userId: string) {
+  const room = await prisma.room.findFirst({ where: { userId, roomId } });
+  if (!room) {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+}
+
 export const conversations = createTRPCRouter({
   askQuestion: authProcedure
     .input(
@@ -17,6 +24,8 @@ export const conversations = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { roomId } = input;
+      const { userId } = ctx.userInfo;
+      await checkIfItsHisRoom(roomId, userId);
       const last14Messages = await prisma.message.findMany({
         where: { roomId },
         orderBy: { messageId: "desc" },
@@ -46,7 +55,7 @@ answer:-`;
         ],
         max_tokens: 150,
       });
-      const [newQuestion, newAnswer, room] = await prisma.$transaction([
+      const [newQuestion, newAnswer] = await prisma.$transaction([
         prisma.message.create({
           data: {
             roomId,
@@ -66,22 +75,23 @@ answer:-`;
           data: { updatedAt: new Date(Date.now()) },
         }),
       ]);
-      console.log(room);
       return newAnswer;
     }),
   //check if every auth can excess this or not
   infiniteMessage: authProcedure
     .input(z.object({ roomId: z.number(), cursor: z.number().optional() }))
 
-    .query(({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { roomId, cursor: cursorId } = input;
+      const { userId } = ctx.userInfo;
+      await checkIfItsHisRoom(roomId, userId);
+
       /*
        * When cursor exists
        */
       if (!cursorId) {
         return prisma.message.findMany({
           where: { roomId },
-          take: 14,
           orderBy: [{ messageId: "desc" }],
         });
       }

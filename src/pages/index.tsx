@@ -74,9 +74,7 @@ const Home: NextPage = () => {
       setHasMore(false);
     }
   }
-  if (rooms && rooms.length === 0) {
-    return <div className="text-center">No Rooms</div>;
-  }
+
   if (!rooms) {
     const allSkeleton = new Array(skeletonRoomLength).fill(0);
     return (
@@ -109,6 +107,10 @@ const Home: NextPage = () => {
         setSearching={setSearching}
       />
       {searching && <div>searching...</div>}
+      {rooms && rooms.length === 0 && (
+        <div className="text-center">No Rooms</div>
+      )}
+
       <InfiniteScroll
         dataLength={rooms.length}
         next={NextRooms}

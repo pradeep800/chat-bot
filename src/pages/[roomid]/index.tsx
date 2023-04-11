@@ -12,6 +12,7 @@ import { useRef } from "react";
 import Messages from "~/components/messages";
 import { toast } from "react-hot-toast";
 import Loading from "~/components/loading";
+import Forbidden from "~/components/forbidden";
 export default function Pages() {
   const router = useRouter();
   const roomId = useRef<number>(parseInt(router.query.roomid as string));
@@ -105,6 +106,7 @@ export default function Pages() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    error,
   } = api.conversations.infiniteMessage.useInfiniteQuery(
     {
       roomId: roomId.current,
@@ -181,7 +183,9 @@ export default function Pages() {
       };
     }
   }, [hasNextPage]);
-
+  if (error?.message === "FORBIDDEN") {
+    return <Forbidden />;
+  }
   if (isLoading) {
     return <Loading hidden />;
   }
@@ -202,6 +206,7 @@ export default function Pages() {
     setQuestion("");
     setIsAsking(true);
   }
+
   return (
     <div className="m-auto  max-w-[800px] ">
       <div>
