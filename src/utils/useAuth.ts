@@ -25,10 +25,10 @@ export function useAuth() {
       return;
     }
     if (!loading) {
-      let interval = setTimeout(() => {
+      const timeout = setTimeout(() => {
         setLoading(loading);
       }, 3000);
-      return () => clearTimeout(interval);
+      return () => clearTimeout(timeout);
     }
     setLoading(loading);
   }, [user, loading]);

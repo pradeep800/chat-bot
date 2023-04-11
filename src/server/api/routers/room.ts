@@ -54,7 +54,7 @@ export const rooms = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { roomId } = input;
       const room = await prisma.room.update({
-        where: { roomId: input.roomId },
+        where: { roomId: roomId },
         data: { title: input.title },
       });
 
@@ -89,9 +89,23 @@ export const rooms = createTRPCRouter({
     .mutation(({ input, ctx }) => {
       const { substring } = input;
       const { userId } = ctx.userInfo;
+
       return prisma.room.findMany({
         where: { userId, title: { contains: substring } },
         orderBy: { updatedAt: "desc" },
+        take: 15,
+      });
+    }),
+  nextSearchRooms: authProcedure
+    .input(z.object({ substring: z.string(), cursorId: z.number().optional() }))
+    .mutation(({ ctx, input }) => {
+      const { userId } = ctx.userInfo;
+      const { cursorId: cursorId, substring } = input;
+      return prisma.room.findMany({
+        where: { userId, title: { contains: substring } },
+        orderBy: { updatedAt: "desc" },
+        cursor: { roomId: cursorId },
+        skip: 1,
         take: 15,
       });
     }),

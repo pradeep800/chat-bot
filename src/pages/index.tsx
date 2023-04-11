@@ -13,6 +13,8 @@ import Loading from "~/components/loading";
 
 export const TenMillion = 100000000;
 const Home: NextPage = () => {
+  const [searching, setSearching] = useState(false);
+  const [title, setTitle] = useState("");
   const [skeletonRoomLength] = useState(() => {
     const length =
       parseInt(localStorage.getItem("skeletonRoomLength") as string) || 2;
@@ -32,7 +34,7 @@ const Home: NextPage = () => {
    * Fetching First 15 Rooms
    */
 
-  const { mutate: getNext15Rooms } = api.rooms.getNext15Rooms.useMutation({
+  const { mutate: searchNextRooms } = api.rooms.nextSearchRooms.useMutation({
     onSuccess: (data) => {
       setHasMore(data.length === noOfRoomForPagination ? true : false);
       utils.rooms.get15Rooms.setData(undefined, (oldRooms) => [
@@ -64,7 +66,7 @@ const Home: NextPage = () => {
     if (rooms) {
       const lastRoom = rooms[rooms.length - 1];
       if (lastRoom) {
-        getNext15Rooms({ cursorId: lastRoom.roomId });
+        searchNextRooms({ substring: title, cursorId: lastRoom.roomId });
       } else {
         setHasMore(false);
       }
@@ -78,7 +80,14 @@ const Home: NextPage = () => {
     return (
       <>
         <div className="mx-auto max-w-[800px]">
-          <CreateRooms />
+          <CreateRooms
+            title={title}
+            setTitle={setTitle}
+            hasMore={hasMore}
+            setHasMore={setHasMore}
+            searching={searching}
+            setSearching={setSearching}
+          />
           {allSkeleton.map((_, index) => (
             <Skeleton key={index} />
           ))}
@@ -89,7 +98,15 @@ const Home: NextPage = () => {
 
   return (
     <div className="m-auto max-w-[800px]">
-      <CreateRooms />
+      <CreateRooms
+        title={title}
+        setTitle={setTitle}
+        setHasMore={setHasMore}
+        hasMore={hasMore}
+        searching={searching}
+        setSearching={setSearching}
+      />
+      {searching && <div>searching...</div>}
       <InfiniteScroll
         dataLength={rooms.length}
         next={NextRooms}

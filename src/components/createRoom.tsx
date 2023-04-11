@@ -1,23 +1,50 @@
 import { Room } from "@prisma/client";
 import _ from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { TenMillion } from "~/pages";
+import { noOfRoomForPagination } from "~/staticVeriable/paginationRoom";
 import { api } from "~/utils/api";
 // import useRainbow from "~/utils/useRainbow";
 import { useInfo } from "~/utils/userInfoStore";
 
-export default function CreateRooms() {
+export default function CreateRooms({
+  title,
+  setTitle,
+  hasMore,
+  setHasMore,
+  searching,
+  setSearching,
+}: {
+  title: string;
+  setTitle: (str: string) => void;
+  hasMore: boolean;
+  setHasMore: (has: boolean) => void;
+  searching: boolean;
+  setSearching: (has: boolean) => void;
+}) {
   const utils = api.useContext();
-  // const colors = useRainbow({ intervalDelay: 100 });
   const userInfo = useInfo((state) => state.userInfo);
-  const [title, setTitle] = useState("");
+  /*
+   * Search Mutation
+   */
+  const { mutate: searchForTitle } = api.rooms.searchRooms.useMutation({
+    onSuccess: (foundRooms) => {
+      setSearching(false);
+      setHasMore(foundRooms.length === noOfRoomForPagination ? true : false);
+      utils.rooms.get15Rooms.setData(undefined, foundRooms);
+    },
+  });
+  /*
+   * create Room
+   */
   const { mutate: createRoomMutation } = api.rooms.createRoom.useMutation({
     onSuccess: (data) => {
       const prevRooms = utils.rooms.get15Rooms.getData();
       prevRooms?.shift();
       const newRooms = [data, ...(prevRooms ?? [])];
       utils.rooms.get15Rooms.setData(undefined, () => newRooms);
+      searchForTitle({ substring: title });
     },
     onMutate: (newRoomTitle) => {
       //TODO Change room Id
@@ -44,14 +71,7 @@ export default function CreateRooms() {
       toast.error("Unable To Create Room");
     },
   });
-  /*
-   * Search Mutation
-   */
-  const { mutate: searchForTitle } = api.rooms.searchRooms.useMutation({
-    onSuccess: (foundRooms) => {
-      console.log(foundRooms);
-    },
-  });
+
   const searchRoom = useCallback(
     _.debounce((title: string) => {
       console.log(title);
@@ -59,6 +79,10 @@ export default function CreateRooms() {
     }, 500),
     []
   );
+  useEffect(() => {
+    searchRoom(title);
+    setSearching(true);
+  }, [title]);
   function createRoom() {
     createRoomMutation({ title: title });
     setTitle("");
@@ -72,26 +96,10 @@ export default function CreateRooms() {
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
-          searchRoom(e.target.value);
         }}
       />
       <button
         className="rounded bg-slate-300 p-1 hover:bg-slate-400"
-        // style={{
-        //   transition: `
-        //   ${colorKeys[0]} ${100}ms linear,
-        //   ${colorKeys[1]} ${100}ms linear,
-        //   ${colorKeys[2]} ${100}ms linear
-        // `,
-        //   background: `
-        //   radial-gradient(
-        //     circle at top left,
-        //     var(${colorKeys[2]}),
-        //     var(${colorKeys[1]}),
-        //     var(${colorKeys[0]})
-        //   )
-        // `,
-        // }}
         onClick={() => {
           if (title) {
             createRoom();
