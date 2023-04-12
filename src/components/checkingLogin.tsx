@@ -21,7 +21,7 @@ export default function CheckLogin() {
       <div
         className={`bg-gradient-to-r from-sky-500 to-indigo-500 bg-clip-text text-2xl text-transparent`}
       >
-        Checking Login {dots}
+        Checking Login{dots}
       </div>
     </div>
   );
