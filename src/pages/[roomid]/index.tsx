@@ -4,7 +4,6 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useState,
 } from "react";
 import { api } from "~/utils/api";
@@ -210,7 +209,7 @@ export default function Pages() {
   }
 
   return (
-    <div className="m-auto  max-w-[800px] ">
+    <div className="m-auto  max-w-[650px] ">
       <div>
         {JSON.stringify(chatPages?.pages[0]) === "[]" && (
           <div className="flex h-[85vh] items-center justify-center text-lg font-bold text-blue-500 ">

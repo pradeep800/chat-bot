@@ -90,7 +90,7 @@ export default function CreateRooms({
         }}
       />
       <button
-        className="rounded bg-slate-300 p-1 hover:bg-slate-400"
+        className="rounded bg-blue-300 p-1 hover:bg-blue-400"
         onClick={() => {
           if (title) {
             createRoom();

@@ -2,7 +2,6 @@ import { Room } from "@prisma/client";
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
-import * as _ from "lodash";
 import RoomList from "~/components/roomList";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { noOfRoomForPagination } from "~/staticVeriable/variable";
@@ -25,7 +24,7 @@ const Home: NextPage = () => {
   });
   const [hasMore, setHasMore] = useState(true);
   /*
-   * Fetching First 15 Rooms
+   * Fetching First rooms
    */
 
   const { mutate: searchNextRooms } = api.rooms.nextSearchRooms.useMutation({
@@ -45,7 +44,7 @@ const Home: NextPage = () => {
   const [on, setOn] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && JSON.stringify([]) === JSON.stringify(rooms)) {
+    if (!isLoading && rooms?.length === 0) {
       setHasMore(false);
     }
     if (rooms) {

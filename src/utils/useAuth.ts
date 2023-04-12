@@ -27,7 +27,7 @@ export function useAuth() {
     if (!loading) {
       const timeout = setTimeout(() => {
         setLoading(loading);
-      }, 3000);
+      }, 1000);
       return () => clearTimeout(timeout);
     }
     setLoading(loading);
