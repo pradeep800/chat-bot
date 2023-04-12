@@ -9,8 +9,8 @@ import { Toaster } from "react-hot-toast";
 import { useInfo } from "~/utils/userInfoStore";
 import { useAuth } from "~/utils/useAuth";
 import { Nunito } from "next/font/google";
-import Image from "next/image";
 import Head from "next/head";
+import CheckLogin from "~/components/checkingLogin";
 const nunito = Nunito({ subsets: ["cyrillic"], weight: "variable" });
 const MyApp: AppType = ({ Component, pageProps }) => {
   const loading = useInfo((state) => state.loading);
@@ -20,15 +20,8 @@ const MyApp: AppType = ({ Component, pageProps }) => {
    */
   if (loading) {
     return (
-      <div
-        className={`flex h-[90%] w-[100vw] flex-col items-center justify-center gap-3 ${nunito.className} text-2xl font-bold`}
-      >
-        {/* <Image className="p-2" src={waitingSpunchBob} alt="waiting Photo" /> */}
-        <div
-          className={`bg-gradient-to-r from-sky-500 to-indigo-500 bg-clip-text text-2xl text-transparent`}
-        >
-          Checking Login....
-        </div>
+      <div className={`${nunito.className} h-[100%]`}>
+        <CheckLogin />
       </div>
     );
   }
