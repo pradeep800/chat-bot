@@ -22,7 +22,6 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     return (
       <div className={`${nunito.className} h-[100%]`}>
         <CheckLogin />
-        <div></div>
       </div>
     );
   }
