@@ -122,6 +122,8 @@ export default function Pages() {
         return lastPageRoomId;
       },
       staleTime: Infinity,
+      retry: false,
+      refetchOnWindowFocus: false,
     }
   );
 
