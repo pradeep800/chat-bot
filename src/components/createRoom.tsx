@@ -1,6 +1,6 @@
 import { Room } from "@prisma/client";
 import _ from "lodash";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { TenMillion } from "~/pages";
 import { noOfRoomForPagination } from "~/staticVeriable/variable";
@@ -18,6 +18,8 @@ export default function CreateRooms({
   setHasMore: (has: boolean) => void;
   setSearching: (has: boolean) => void;
 }) {
+  const [firstRenderOfThisComponent, setFirstRenderOfThisComponent] =
+    useState(false);
   const utils = api.useContext();
   const userInfo = useInfo((state) => state.userInfo);
   /*
@@ -71,9 +73,14 @@ export default function CreateRooms({
     }, 500),
     []
   );
+
   useEffect(() => {
-    searchRoom(title);
-    setSearching(true);
+    if (!firstRenderOfThisComponent) {
+      setFirstRenderOfThisComponent(true);
+    } else {
+      searchRoom(title);
+      setSearching(true);
+    }
   }, [title]);
   function createRoom() {
     createRoomMutation({ title: title });
